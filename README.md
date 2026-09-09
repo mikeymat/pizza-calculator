@@ -11,6 +11,28 @@ attiva di default e un profilo opzionale con HTTPS automatico.
   certificato Let's Encrypt e redirect HTTP → HTTPS
 - **Flow di esempio** in `flows/`, caricati automaticamente all'avvio
 
+## Provarlo subito su GitHub Codespaces
+
+[![Apri in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mikeymat/kestra)
+
+Se non hai (ancora) un server, il repo e' pronto per Codespaces: `.devcontainer/`
+crea la macchina con Docker, genera `.env` e avvia lo stack da solo. Al termine
+trovi Kestra nel pannello **Ports** di VS Code, sulla porta 8080, a un indirizzo
+tipo `https://<nome-codespace>-8080.app.github.dev`. URL e credenziali vengono
+ristampati a ogni apertura del terminale.
+
+La prima creazione richiede qualche minuto: scarica ~3 GB di immagini.
+
+Due cose da sapere:
+
+- **La porta e' privata**: la vedi solo tu, dopo il login su GitHub. Se ti serve
+  che un servizio esterno chiami un webhook, rendila raggiungibile con
+  `gh codespace ports visibility 8080:public -c "$CODESPACE_NAME"`.
+- **Non e' un'istanza h24**: il codespace si ferma da solo dopo un po' di
+  inattivita' e consuma le ore incluse nel piano. I dati restano nei volumi e
+  tornano al riavvio, ma per qualcosa di stabile usa un server tuo, come
+  descritto sotto.
+
 ## Prerequisiti
 
 Una macchina raggiungibile in rete (VPS, server in ufficio, il tuo portatile)
@@ -154,6 +176,7 @@ make restart
 
 ```
 docker-compose.yml   Kestra + Postgres, e Caddy nel profilo "tls"
+.devcontainer/       avvio automatico su GitHub Codespaces
 .env.example         tutte le variabili, commentate
 Makefile             comandi di uso quotidiano
 caddy/Caddyfile      reverse proxy e TLS
@@ -174,5 +197,8 @@ scripts/backup.sh    dump di database e storage
 - **Il certificato non viene emesso**: il dominio deve risolvere su questo
   server e le porte 80 e 443 devono essere raggiungibili da internet;
   `docker compose logs caddy` dice il motivo esatto.
+- **`FATAL: password authentication failed`**: hai rigenerato `.env` su un
+  volume Postgres che esisteva gia'. O rimetti la vecchia `POSTGRES_PASSWORD`,
+  o riparti pulito con `docker compose down -v` (cancella i dati).
 - **I task Docker falliscono**: serve il mount di `/var/run/docker.sock` e la
   stessa path `/tmp/kestra-wd` dentro e fuori dal container (gia' configurati).

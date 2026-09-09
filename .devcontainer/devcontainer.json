@@ -1,0 +1,42 @@
+{
+	"name": "Kestra",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+
+	// Kestra e Postgres girano in container, e i task di Kestra ne avviano altri:
+	// serve un demone Docker dentro il codespace.
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+
+	// Minimi per far girare Kestra + Postgres. Una macchina 4-core e' piu' comoda,
+	// ma consuma il doppio delle ore incluse nel piano.
+	"hostRequirements": {
+		"cpus": 2,
+		"memory": "8gb",
+		"storage": "32gb"
+	},
+
+	"forwardPorts": [8080],
+	"portsAttributes": {
+		"8080": {
+			"label": "Kestra UI",
+			"onAutoForward": "notify"
+		}
+	},
+
+	// Genera .env con l'URL pubblico del codespace e avvia lo stack.
+	"postCreateCommand": ".devcontainer/start-kestra.sh",
+	// Dopo uno stop/start del codespace i container ripartono da soli.
+	"postStartCommand": "docker compose up -d",
+	// Ristampa URL e credenziali ogni volta che apri un terminale.
+	"postAttachCommand": ".devcontainer/show-access.sh",
+	"waitFor": "postCreateCommand",
+
+	"customizations": {
+		"vscode": {
+			"extensions": ["kestra-io.kestra"]
+		}
+	},
+
+	"remoteUser": "vscode"
+}
