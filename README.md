@@ -48,9 +48,20 @@ make up        # avvia Kestra + Postgres
 make logs      # segui l'avvio: il primo giro richiede 30-60 secondi
 ```
 
-Poi apri `http://localhost:8080` e accedi con l'email e la password mostrate da
-`make setup`. Di default Kestra ascolta **solo su 127.0.0.1**: la sezione
-seguente spiega come aprirlo verso l'esterno.
+Poi apri `http://localhost:8080`: Kestra mostra la sua pagina di login, dove
+inserisci l'email e la password stampate da `make setup`. Se le hai perse sono
+sempre in chiaro nel `.env`:
+
+```bash
+grep KESTRA_ADMIN .env
+```
+
+Per cambiare password modifica `KESTRA_ADMIN_PASSWORD` in `.env` e fai
+`make restart`. Per chiamare l'API si usano le stesse credenziali in basic auth
+(`curl -u email:password ...`).
+
+Di default Kestra ascolta **solo su 127.0.0.1**: la sezione seguente spiega come
+aprirlo verso l'esterno.
 
 ## Come collegarti da remoto
 
