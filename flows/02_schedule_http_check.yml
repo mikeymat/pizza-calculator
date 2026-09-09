@@ -1,0 +1,27 @@
+id: 02_schedule_http_check
+namespace: demo.setup
+description: |
+  Esempio di flow schedulato: ogni ora interroga un endpoint HTTP e logga
+  il codice di risposta. Mostra trigger Schedule + task HTTP + espressioni.
+
+inputs:
+  - id: url
+    type: URI
+    defaults: https://hub.docker.com/v2/repositories/kestra/kestra
+
+tasks:
+  - id: chiamata
+    type: io.kestra.plugin.core.http.Request
+    uri: "{{ inputs.url }}"
+    method: GET
+
+  - id: esito
+    type: io.kestra.plugin.core.log.Log
+    message: "HTTP {{ outputs.chiamata.code }} da {{ inputs.url }}"
+
+triggers:
+  - id: ogni_ora
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "@hourly"
+    # Il trigger parte disabilitato: abilitalo dalla UI quando l'istanza e' pronta.
+    disabled: true

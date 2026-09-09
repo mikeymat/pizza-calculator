@@ -1,0 +1,23 @@
+id: 01_hello_world
+namespace: demo.setup
+description: |
+  Flow minimo per verificare che l'istanza funzioni.
+  Lancialo dalla UI con "Execute" o via API.
+
+labels:
+  owner: platform
+  env: remote
+
+inputs:
+  - id: name
+    type: STRING
+    defaults: mondo
+
+tasks:
+  - id: saluto
+    type: io.kestra.plugin.core.log.Log
+    message: "Ciao {{ inputs.name }}! L'istanza Kestra risponde correttamente."
+
+  - id: riepilogo
+    type: io.kestra.plugin.core.log.Log
+    message: "Esecuzione {{ execution.id }} del flow {{ flow.namespace }}.{{ flow.id }}"

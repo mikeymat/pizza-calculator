@@ -1,0 +1,15 @@
+id: 04_python_in_docker
+namespace: demo.setup
+description: |
+  Verifica che il task runner Docker funzioni: lo script gira in un container
+  python separato (serve il mount di /var/run/docker.sock in docker-compose.yml).
+
+tasks:
+  - id: python
+    type: io.kestra.plugin.scripts.python.Script
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    containerImage: python:3.12-slim
+    script: |
+      import platform
+      print(f"Python {platform.python_version()} dentro un container gestito da Kestra")

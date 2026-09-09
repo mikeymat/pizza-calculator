@@ -1,0 +1,113 @@
+# Kestra - stack di produzione leggera, accessibile da remoto.
+#
+#   docker compose up -d                 # Kestra + Postgres (HTTP, basic auth)
+#   docker compose --profile tls up -d   # + Caddy: HTTPS automatico su KESTRA_DOMAIN
+#
+# Tutti i valori arrivano da .env (vedi .env.example / `make setup`).
+
+name: kestra
+
+volumes:
+  postgres-data:
+  kestra-data:
+  caddy-data:
+  caddy-config:
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-16-alpine}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kestra}
+      POSTGRES_USER: ${POSTGRES_USER:-kestra}
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?manca POSTGRES_PASSWORD in .env - esegui make setup}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # Non esposto sull'host: solo Kestra lo raggiunge, sulla rete interna di compose.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  kestra:
+    image: kestra/kestra:${KESTRA_VERSION:-v2.0.0}
+    restart: unless-stopped
+    # Kestra ha 5m di grace period per i task in corso: si concede qualcosa in piu'.
+    stop_grace_period: 6m
+    # root serve solo per accedere al socket Docker (task runner Docker).
+    # Se non ti serve eseguire task in container, togli `user` e il mount del socket.
+    user: "root"
+    command: server standalone --flow-path=/app/flows
+    environment:
+      KESTRA_CONFIGURATION: |
+        datasources:
+          postgres:
+            url: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-kestra}
+            driverClassName: org.postgresql.Driver
+            username: "${POSTGRES_USER:-kestra}"
+            password: "${POSTGRES_PASSWORD}"
+        kestra:
+          # I flow di esempio del tutorial: qui carichiamo i nostri da ./flows.
+          tutorial-flows:
+            enabled: false
+          server:
+            basic-auth:
+              # username = email valida; password >= 8 caratteri con maiuscola, minuscola e numero.
+              username: "${KESTRA_ADMIN_EMAIL:?manca KESTRA_ADMIN_EMAIL in .env}"
+              password: "${KESTRA_ADMIN_PASSWORD:?manca KESTRA_ADMIN_PASSWORD in .env}"
+          repository:
+            type: postgres
+          queue:
+            type: postgres
+          storage:
+            type: local
+            local:
+              base-path: /app/storage
+          tasks:
+            tmp-dir:
+              path: /tmp/kestra-wd/tmp
+          # Deve combaciare con l'URL pubblico: e' quello usato nei link e nei webhook.
+          url: ${KESTRA_URL:-http://localhost:8080/}
+    volumes:
+      - kestra-data:/app/storage
+      # Flow versionati in questo repo, caricati all'avvio (sola lettura).
+      - ./flows:/app/flows:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Stesso path dentro e fuori dal container: serve ai task che girano in Docker.
+      - /tmp/kestra-wd:/tmp/kestra-wd
+    ports:
+      # KESTRA_BIND=127.0.0.1 -> raggiungibile solo via tunnel SSH o reverse proxy.
+      # KESTRA_BIND=0.0.0.0   -> esposto sulla rete (usa HTTPS o una VPN).
+      - "${KESTRA_BIND:-127.0.0.1}:${KESTRA_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  # Profilo "tls": HTTPS automatico (Let's Encrypt) davanti a Kestra.
+  # Richiede KESTRA_DOMAIN che punta a questo host e le porte 80/443 libere.
+  caddy:
+    image: caddy:${CADDY_VERSION:-2-alpine}
+    profiles: ["tls"]
+    restart: unless-stopped
+    environment:
+      # Se KESTRA_DOMAIN non e' impostato Caddy ripiega su un certificato self-signed per localhost.
+      KESTRA_DOMAIN: "${KESTRA_DOMAIN:-localhost}"
+      # Diventa la direttiva `email ...` del Caddyfile, o una riga vuota se ACME_EMAIL manca.
+      CADDY_ACME_EMAIL_DIRECTIVE: ${ACME_EMAIL:+email ${ACME_EMAIL}}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - kestra

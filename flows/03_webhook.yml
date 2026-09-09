@@ -1,0 +1,21 @@
+id: 03_webhook
+namespace: demo.setup
+description: |
+  Punto di ingresso per sistemi esterni: chiama l'URL del webhook e il flow parte.
+
+    curl -X POST -H 'Content-Type: application/json' \
+      -d '{"messaggio":"ciao"}' \
+      "$KESTRA_URL/api/v1/main/executions/webhook/demo.setup/03_webhook/CAMBIA_QUESTA_CHIAVE"
+
+  Gli URL dei webhook non richiedono la basic auth: la chiave qui sotto e' l'unico
+  segreto, quindi sostituiscila con una stringa casuale (openssl rand -hex 24).
+
+tasks:
+  - id: mostra_payload
+    type: io.kestra.plugin.core.log.Log
+    message: "Ricevuto: {{ trigger.body ?? 'esecuzione manuale, nessun payload' }}"
+
+triggers:
+  - id: webhook
+    type: io.kestra.plugin.core.trigger.Webhook
+    key: CAMBIA_QUESTA_CHIAVE

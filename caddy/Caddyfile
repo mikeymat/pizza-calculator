@@ -1,0 +1,23 @@
+{
+	# Popolato da docker-compose a partire da ACME_EMAIL (riga vuota se non impostata):
+	# Let's Encrypt la usa per avvisarti sulla scadenza dei certificati.
+	{$CADDY_ACME_EMAIL_DIRECTIVE}
+}
+
+{$KESTRA_DOMAIN} {
+	encode zstd gzip
+
+	# Kestra resta sulla rete interna di compose: solo Caddy lo espone.
+	reverse_proxy kestra:8080 {
+		# I log in streaming e gli eventi della UI sono long-lived: niente buffering.
+		flush_interval -1
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+
+	log {
+		output stdout
+	}
+}
