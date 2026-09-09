@@ -1,0 +1,114 @@
+id: 05_eventhub_to_kafka
+namespace: demo.integrazioni
+description: |
+  Legge gli eventi da un Azure Event Hub e li ripubblica su un topic Kafka.
+
+  Micro-batch: a ogni esecuzione consuma per `maxDuration`, scrive gli eventi in
+  un file interno, li rimappa nel formato dei record Kafka e li produce in blocco.
+  E' l'approccio da preferire con volumi non banali: un'esecuzione per batch
+  invece di una per messaggio.
+
+  Prima di abilitare il trigger, crea le voci KV del namespace (UI: Namespaces ->
+  demo.integrazioni -> KV Store):
+
+    EVENTHUB_NAMESPACE          il namespace, senza .servicebus.windows.net
+    EVENTHUB_NAME               nome dell'Event Hub
+    EVENTHUB_CONNECTION_STRING  connection string con diritti di Listen
+    EVENTHUB_CHECKPOINT_CONTAINER  container Blob per i checkpoint (es. kestra)
+    AZURE_STORAGE_CONNECTION_STRING  connection string dello Storage Account
+    KAFKA_BOOTSTRAP_SERVERS     es. broker1:9093,broker2:9093
+
+  In alternativa alle KV puoi usare `{{ secret('NOME') }}`, che legge la
+  variabile d'ambiente `SECRET_NOME` (valore codificato in base64) del container.
+
+  Il checkpoint store e' obbligatorio: e' li' che Event Hubs registra fin dove
+  hai letto, quindi ogni esecuzione riparte da dove si era fermata la precedente.
+
+labels:
+  owner: platform
+  dominio: streaming
+
+# Un'esecuzione alla volta: due batch in parallelo si contenderebbero il
+# checkpoint dello stesso consumer group.
+concurrency:
+  limit: 1
+
+variables:
+  kafka_topic: eventhub-mirror
+
+tasks:
+  - id: consuma_da_eventhub
+    type: io.kestra.plugin.azure.eventhubs.Consume
+    namespace: "{{ kv('EVENTHUB_NAMESPACE') }}"
+    eventHubName: "{{ kv('EVENTHUB_NAME') }}"
+    connectionString: "{{ kv('EVENTHUB_CONNECTION_STRING') }}"
+    consumerGroup: $Default
+    # JSON: il payload diventa un oggetto strutturato. Se sull'Event Hub passano
+    # testo o binario, metti STRING (e valueSerializer STRING piu' sotto).
+    bodyDeserializer: JSON
+    # Quanto dura la finestra di consumo di ogni esecuzione.
+    maxDuration: PT30S
+    maxBatchSizePerPartition: 500
+    # Vale solo al primo giro, quando non c'e' ancora un checkpoint.
+    partitionStartingPosition: EARLIEST
+    checkpointStoreProperties:
+      containerName: "{{ kv('EVENTHUB_CHECKPOINT_CONTAINER') }}"
+      connectionString: "{{ kv('AZURE_STORAGE_CONNECTION_STRING') }}"
+
+  - id: se_ci_sono_eventi
+    type: io.kestra.plugin.core.flow.If
+    # Con zero eventi non ha senso aprire una connessione a Kafka.
+    condition: "{{ outputs.consuma_da_eventhub.eventsCount > 0 }}"
+    then:
+      # Le righe prodotte da Event Hubs hanno i campi partitionKey, body,
+      # contentType, correlationId, messageId, enqueuedTimestamp, offset,
+      # sequenceNumber, properties. Kafka si aspetta key, value, timestamp,
+      # headers (e opzionalmente topic e partition): qui si fa la traduzione.
+      - id: mappa_per_kafka
+        type: io.kestra.plugin.graalvm.js.FileTransform
+        from: "{{ outputs.consuma_da_eventhub.uri }}"
+        script: |
+          var result = {
+            // Conserva la chiave di partizionamento: eventi con la stessa
+            // chiave restano ordinati anche sul topic di destinazione.
+            key: row.partitionKey || row.messageId,
+            value: row.body,
+            // enqueuedTimestamp e' epoch in millisecondi: diventa il timestamp
+            // del record Kafka, cosi' il tempo evento non si perde.
+            timestamp: row.enqueuedTimestamp,
+            headers: {
+              "eventhub-offset": String(row.offset),
+              "eventhub-sequence-number": String(row.sequenceNumber),
+              "eventhub-message-id": row.messageId || "",
+              "eventhub-correlation-id": row.correlationId || "",
+              "eventhub-content-type": row.contentType || ""
+            }
+          };
+          row = result;
+
+      - id: pubblica_su_kafka
+        type: io.kestra.plugin.kafka.Produce
+        from: "{{ outputs.mappa_per_kafka.uri }}"
+        topic: "{{ vars.kafka_topic }}"
+        keySerializer: STRING
+        # JSON perche' il body arriva deserializzato. Con bodyDeserializer STRING
+        # qui va STRING.
+        valueSerializer: JSON
+        properties:
+          bootstrap.servers: "{{ kv('KAFKA_BOOTSTRAP_SERVERS') }}"
+          # Broker gestiti (Confluent Cloud, Event Hubs in modalita' Kafka, MSK
+          # con SASL): decommenta e adatta.
+          # security.protocol: SASL_SSL
+          # sasl.mechanism: PLAIN
+          # sasl.jaas.config: "org.apache.kafka.common.security.plain.PlainLoginModule required username='{{ kv('KAFKA_USERNAME') }}' password='{{ kv('KAFKA_PASSWORD') }}';"
+
+      - id: riepilogo
+        type: io.kestra.plugin.core.log.Log
+        message: "Inoltrati {{ outputs.pubblica_su_kafka.messagesCount }} messaggi su {{ vars.kafka_topic }} (letti {{ outputs.consuma_da_eventhub.eventsCount }} eventi)."
+
+triggers:
+  - id: ogni_5_minuti
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "*/5 * * * *"
+    # Abilitalo dalla UI dopo aver creato le voci KV e provato il flow a mano.
+    disabled: true

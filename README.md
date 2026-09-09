@@ -136,12 +136,43 @@ Vengono caricati all'avvio da `flows/` (montata in sola lettura) nel namespace
 `demo.setup`. Modificali dalla UI per provare, ma ricorda che la cartella e' la
 fonte di verita' al riavvio: le modifiche da tenere vanno committate qui.
 
-| File | Cosa mostra |
+| File | Namespace | Cosa mostra |
+| --- | --- | --- |
+| `01_hello_world.yml` | `demo.setup` | flow minimo con input, per verificare l'istanza |
+| `02_schedule_http_check.yml` | `demo.setup` | trigger `Schedule` (disabilitato) + chiamata HTTP |
+| `03_webhook.yml` | `demo.setup` | ingresso da sistemi esterni via webhook |
+| `04_python_in_docker.yml` | `demo.setup` | task Python eseguito in un container separato |
+| `05_eventhub_to_kafka.yml` | `demo.integrazioni` | Azure Event Hub → Kafka a micro-batch |
+| `06_eventhub_to_kafka_realtime.yml` | `demo.integrazioni` | la stessa cosa, un'esecuzione per evento |
+
+### Event Hub → Kafka
+
+I flow 05 e 06 fanno la stessa cosa con due compromessi diversi: il **05** apre
+una finestra di consumo a ogni esecuzione schedulata e produce in blocco (una
+esecuzione per batch: e' quello da usare con volumi seri); il **06** tiene il
+trigger collegato all'Event Hub e fa partire un'esecuzione per ogni evento
+(latenza minima, adatto a volumi contenuti).
+
+Le credenziali non stanno nei file: entrambi leggono dal **KV Store** del
+namespace (UI: Namespaces → `demo.integrazioni` → KV Store). Vanno create prima
+di abilitare i trigger:
+
+| Chiave | Valore |
 | --- | --- |
-| `01_hello_world.yml` | flow minimo con input, per verificare l'istanza |
-| `02_schedule_http_check.yml` | trigger `Schedule` (disabilitato) + chiamata HTTP |
-| `03_webhook.yml` | ingresso da sistemi esterni via webhook |
-| `04_python_in_docker.yml` | task Python eseguito in un container separato |
+| `EVENTHUB_NAMESPACE` | il namespace, senza `.servicebus.windows.net` |
+| `EVENTHUB_NAME` | nome dell'Event Hub |
+| `EVENTHUB_CONNECTION_STRING` | connection string con diritti di *Listen* |
+| `EVENTHUB_CHECKPOINT_CONTAINER` | container Blob per i checkpoint |
+| `AZURE_STORAGE_CONNECTION_STRING` | connection string dello Storage Account |
+| `KAFKA_BOOTSTRAP_SERVERS` | es. `broker1:9093,broker2:9093` |
+
+Il checkpoint store su Azure Blob e' obbligatorio: e' li' che Event Hubs segna
+fin dove hai letto, ed e' quello che fa ripartire ogni esecuzione da dove si era
+fermata la precedente. Per un broker gestito (Confluent Cloud, MSK, Event Hubs
+in modalita' Kafka) ci sono le righe SASL gia' pronte da decommentare nel flow.
+
+I trigger sono **disabilitati**: abilitali dalla UI dopo aver creato le KV e
+provato il flow a mano.
 
 Esempio di esecuzione via API:
 

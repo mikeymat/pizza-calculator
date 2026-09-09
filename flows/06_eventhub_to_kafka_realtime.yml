@@ -1,0 +1,51 @@
+id: 06_eventhub_to_kafka_realtime
+namespace: demo.integrazioni
+description: |
+  Variante in tempo reale di 05_eventhub_to_kafka: invece di leggere a finestre,
+  il trigger resta collegato all'Event Hub e ogni evento fa partire subito
+  un'esecuzione che lo pubblica su Kafka.
+
+  Latenza minima, ma un'esecuzione per messaggio: adatto a flussi con volumi
+  contenuti o quando il ritardo di qualche minuto non e' accettabile. Con
+  migliaia di eventi al minuto usa la versione a micro-batch.
+
+  Usa le stesse voci KV del flow 05.
+
+labels:
+  owner: platform
+  dominio: streaming
+
+variables:
+  kafka_topic: eventhub-mirror
+
+tasks:
+  - id: pubblica_su_kafka
+    type: io.kestra.plugin.kafka.Produce
+    topic: "{{ vars.kafka_topic }}"
+    keySerializer: STRING
+    valueSerializer: STRING
+    properties:
+      bootstrap.servers: "{{ kv('KAFKA_BOOTSTRAP_SERVERS') }}"
+    from:
+      key: "{{ trigger.partitionKey ?? trigger.messageId }}"
+      # Il payload viaggia cosi' com'e': il trigger lo legge come stringa.
+      value: "{{ trigger.body }}"
+      timestamp: "{{ trigger.enqueuedTimestamp }}"
+      headers:
+        eventhub-offset: "{{ trigger.offset }}"
+        eventhub-sequence-number: "{{ trigger.sequenceNumber }}"
+        eventhub-message-id: "{{ trigger.messageId ?? '' }}"
+
+triggers:
+  - id: eventi_in_arrivo
+    type: io.kestra.plugin.azure.eventhubs.RealtimeTrigger
+    namespace: "{{ kv('EVENTHUB_NAMESPACE') }}"
+    eventHubName: "{{ kv('EVENTHUB_NAME') }}"
+    connectionString: "{{ kv('EVENTHUB_CONNECTION_STRING') }}"
+    consumerGroup: $Default
+    bodyDeserializer: STRING
+    checkpointStoreProperties:
+      containerName: "{{ kv('EVENTHUB_CHECKPOINT_CONTAINER') }}"
+      connectionString: "{{ kv('AZURE_STORAGE_CONNECTION_STRING') }}"
+    # Abilitalo dalla UI: appena attivo si collega e comincia a consumare.
+    disabled: true
