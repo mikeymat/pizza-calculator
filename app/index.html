@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Calcolatore per l'impasto della pizza / Pizza dough calculator">
-<meta name="theme-color" content="#c9431f">
+<meta name="theme-color" content="#ba3a19">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -20,14 +20,14 @@
 /* Layout (mobile first): tomato ground with giant butter headline, curved marquee, stacked controls, full-bleed butter result band
    with an arch-framed to-scale pizza, tomato method list, black footer with oversized sign-off. Desktop: controls | sticky results. */
 :root{
-  --tomato:#c9431f; --tomato-deep:#a93617; --butter:#ffe974; --cream:#f7f6f3; --ink:#0d0d0c; --ink-soft:#3b2f12;
+  --tomato:#ba3a19; --hh:72px; --tomato-deep:#a93617; --butter:#ffe974; --cream:#f7f6f3; --ink:#0d0d0c; --ink-soft:#3b2f12;
   --dough:#f3e3bd; --dough-edge:#c98a45; --sauce:#9a2410; --crust:#e8964a; --mozz:#fbf6e9; --basil:#3c7a35; --basil-vein:#8fc283; --char:#6b3a1a; --coral:#f08a6c;
   --font:"Outfit","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --ease:cubic-bezier(.16,1,.3,1);
   color-scheme:light;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:linear-gradient(var(--tomato),var(--tomato)) top/100% 50% no-repeat,var(--ink)}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:linear-gradient(var(--tomato),var(--tomato)) top/100% calc(100% - 300px) no-repeat,var(--ink);scroll-padding-top:calc(var(--hh) + 8px);scroll-padding-bottom:80px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--tomato);color:var(--cream);font-family:var(--font);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--tomato)}
@@ -111,7 +111,7 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 .yeast .pill{height:52px;width:100%;font-size:17px}
 
 /* Results */
-.results{background:var(--butter);color:var(--ink);padding-block:40px;display:grid;gap:24px;scroll-margin-top:64px}
+.results{background:var(--butter);color:var(--ink);padding-block:40px;display:grid;gap:24px}
 .res-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end}
 .res-head .k{font-size:17px;font-weight:600;color:var(--ink-soft)}
 .big{font-weight:800;font-size:clamp(56px,17vw,96px);letter-spacing:-.05em;line-height:.9;margin-top:6px;white-space:nowrap}
@@ -121,13 +121,13 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 .arch svg{width:100%;height:100%;display:block}
 #pzg{transform-box:view-box;transform-origin:60px 66px;transition:transform .55s var(--ease)}
 #sauce{transition:r .4s var(--ease)}
-.diml{font-family:var(--font);font-weight:700;font-size:12px;letter-spacing:-.02em;fill:var(--butter)}
+.diml{font-family:var(--font);font-weight:700;font-size:15px;letter-spacing:-.02em;fill:var(--butter)}
 @media (prefers-reduced-motion:reduce){#pzg,#sauce,.pill,.opt,.bar{transition:none}}
 
 .list{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
 .list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:baseline;padding-block:13px;border-bottom:1px solid color-mix(in srgb,var(--ink) 22%,transparent)}
 .list .n{font-weight:600;font-size:18px;letter-spacing:-.01em;min-width:0}
-.list .p{font-size:14px;color:var(--ink-soft);text-align:right}
+.list .p{font-size:15px;color:var(--ink-soft);text-align:right}
 .list .w{font-weight:700;font-size:24px;letter-spacing:-.03em;min-width:86px;text-align:right}
 .list li.tot{border-bottom:0}
 .list li.tot .n,.list li.tot .w{font-weight:800}
@@ -135,7 +135,7 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 .btn{height:52px;padding:0 26px;border-radius:999px;border:1.5px solid var(--ink);background:var(--ink);color:var(--butter);font-weight:600;font-size:16px}
 .btn:hover{background:none;color:var(--ink)}
 .toast{font-size:14px;font-weight:500}
-.note{margin:0;font-size:14px;color:var(--ink-soft);max-width:52ch}
+.note{margin:0;font-size:15px;color:var(--ink-soft);max-width:52ch}
 
 /* Mobile summary bar */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--ink);color:var(--cream);display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -145,10 +145,11 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 .bar .t{min-width:0;line-height:1.2}
 .bar .t b{display:block;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--butter)}
 .bar .t span{display:block;font-size:13.5px;color:#d9d6cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .t span span{display:inline}
 .bar a{flex:none;height:46px;padding:0 20px;border-radius:999px;background:var(--butter);color:var(--ink);display:inline-flex;align-items:center;font-weight:600;text-decoration:none;font-size:15px}
 
 /* Method */
-.method{padding-block:60px 64px;display:grid;gap:24px;scroll-margin-top:60px}
+.method{padding-block:60px 64px;display:grid;gap:24px}
 .method h2{margin:0;color:var(--butter);font-weight:700;font-size:clamp(44px,11vw,92px);letter-spacing:-.045em;line-height:.92;text-wrap:balance}
 .method .lead{margin:0;max-width:40ch;color:var(--cream)}
 .steps{list-style:none;margin:0;padding:0;counter-reset:s}
@@ -173,6 +174,15 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
 .foot-base{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;margin-top:44px;padding-top:18px;border-top:1px solid #2c2b28;font-size:13.5px;color:#a9a59c}
 .sign{margin-top:18px;font-weight:700;font-size:min(13.6vw,220px);letter-spacing:-.05em;line-height:1.05;color:var(--butter);white-space:nowrap;padding-bottom:calc(.12em + env(safe-area-inset-bottom,0px));user-select:none}
 
+/* Short portrait phones (iPhone SE): reach the first control sooner */
+@media (orientation:portrait) and (max-height:640px){
+  .lede p{display:none}
+  .wave{height:52px}
+}
+@media (max-width:360px){
+  .bar .t span .w2,.bar .t .w2{display:none}
+  .pill{padding:0 4px;font-size:15px}
+}
 @media (min-width:720px){
   .toplinks a{display:inline}
   .lede{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:40px}
@@ -189,6 +199,46 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
   .foot{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
   .method{grid-template-columns:minmax(0,1fr) minmax(0,2fr);column-gap:56px;align-items:start}
   .method h2{grid-row:span 2}
+}
+/* Phones in landscape: controls and results side by side, compact chrome, display type sized by height */
+@media (orientation:landscape) and (max-height:540px) and (min-width:560px){
+  :root{--hh:56px}
+  .top{padding-block:6px}
+  .lang button{height:36px}
+  h1{font-size:min(18.5vw,24vh)}
+  .lede{margin-top:10px;gap:6px}
+  .lede p{display:none}
+  .lede h2{font-size:22px}
+  .lede h2 small{display:none}
+  .wave{height:44px;margin-top:14px}
+  .work{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:4px 32px}
+  .controls.g{padding:8px 0 0}
+  .controls{gap:20px}
+  .lbl{font-size:20px}
+  .ctl legend{margin-bottom:8px}
+  .stepper{height:52px;grid-template-columns:52px minmax(0,1fr) 52px}
+  .stepper button{height:48px}
+  .stepper input{font-size:24px}
+  .pills{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+  .pill{padding:0 4px;height:44px;font-size:15px}
+  .opt{min-height:56px;padding:8px 14px 8px 12px;border-radius:24px}
+  .opt small{display:none}
+  .yeast .pill{height:46px}
+  .results.g{position:sticky;top:calc(var(--hh) + 8px);max-height:calc(100dvh - var(--hh) - 16px);overflow:auto;border-radius:22px;padding:14px 18px 16px;gap:10px;align-self:start;overscroll-behavior:contain}
+  .res-head{gap:10px}
+  .res-head .k{font-size:15px}
+  .big{font-size:48px;margin-top:2px}
+  .meta{font-size:14px;margin-top:4px}
+  .arch{width:70px}
+  .list li{padding-block:6px;gap:10px}
+  .list .n{font-size:16px}
+  .list .w{font-size:19px;min-width:70px}
+  .btn{height:44px}
+  .note{display:none}
+  .bar{display:none}
+  .method{padding-block:40px 48px}
+  .method h2{font-size:min(11vw,18vh)}
+  .sign{font-size:min(13.6vw,30vh)}
 }
 </style>
 </head>
@@ -413,7 +463,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
       '<li class="tot"><span class="n">'+L.total+'</span><span class="p"></span><span class="w">'+fmt(r.total)+' g</span></li>';
     $("note").textContent=L.note;
     $("barBig").textContent=S.n+" × "+r.ball+" g";
-    $("barSub").textContent=L.flour+" "+fmt(r.flour)+" g · "+L.water+" "+fmt(r.water)+" g";
+    $("barSub").innerHTML='<span>'+L.flour+" "+fmt(r.flour)+' g</span><span class="w2"> · '+L.water+" "+fmt(r.water)+" g</span>";
     drawDia(r.p);
     $("d").style.setProperty("--fill",((S.d-20)/25*100)+"%");
     $("dia").setAttribute("aria-label",L.diaLabel(S.d,L.th[S.t][0]));
@@ -454,8 +504,9 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
   };
 
   // Mobile summary bar: hidden while the results band or the footer is on screen
-  try{ var vis={}; var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.tagName]=e.isIntersecting}); $("bar").classList.toggle("off",!!(vis.DIV||vis.FOOTER))},{threshold:.6});
-    io.observe(document.querySelector(".res-head")); io.observe(document.querySelector("footer")); }catch(e){}
+  try{ var vis={}; function upd(es){es.forEach(function(e){vis[e.target.className||e.target.tagName]=e.isIntersecting}); $("bar").classList.toggle("off",!!(vis["res-head"]||vis["list num"]||vis.FOOTER));}
+    var io1=new IntersectionObserver(upd,{threshold:.6}); io1.observe(document.querySelector(".res-head"));
+    var io2=new IntersectionObserver(upd,{threshold:0,rootMargin:"0px 0px -70px 0px"}); io2.observe($("rows")); io2.observe(document.querySelector("footer")); }catch(e){}
 
   // PWA
   try{ if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone){ $("how").hidden=true; $("installed").hidden=false; } }catch(e){}
