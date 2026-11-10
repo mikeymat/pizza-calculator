@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Calcolatore per l'impasto della pizza / Pizza dough calculator">
+<meta name="theme-color" content="#0f100e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+<title>Impasto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,800&family=Raleway:wght@400;500;600&display=swap">
+<style>
+/* Layout: centered wide-tracked masthead, two-column work area (controls | inverted result panel), sage method band, quiet footer. */
+:root{
+  --paper:#ffffff; --ink:#0f100e; --muted:#555b52; --line:#0f100e; --hair:#d9dcd5;
+  --sage:#6e7b65; --on-sage:#f5f6f1; --on-sage-muted:#dfe4d9;
+  --panel:#0f100e; --on-panel:#f5f6f1; --on-panel-muted:#b4b9ae; --panel-hair:#33372f;
+  --dough:#efe6d2; --dough-edge:#c9b48a;
+  --display:"Archivo","Arial Black","Helvetica Neue",sans-serif;
+  --body:"Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121411; --ink:#eef0ea; --muted:#a4aa9f; --line:#eef0ea; --hair:#2e322b;
+  --sage:#4c5745; --on-sage:#f1f3ec; --on-sage-muted:#cfd6c8;
+  --panel:#e9ebe3; --on-panel:#121411; --on-panel-muted:#4f554b; --panel-hair:#c4c8bd;
+  --dough:#efe6d2; --dough-edge:#a8915f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121411; --ink:#eef0ea; --muted:#a4aa9f; --line:#eef0ea; --hair:#2e322b;
+  --sage:#4c5745; --on-sage:#f1f3ec; --on-sage-muted:#cfd6c8;
+  --panel:#e9ebe3; --on-panel:#121411; --on-panel-muted:#4f554b; --panel-hair:#c4c8bd;
+  --dough:#efe6d2; --dough-edge:#a8915f; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased}
+::selection{background:var(--sage);color:var(--on-sage)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,.display{font-family:var(--display);font-stretch:125%;font-weight:800;text-transform:uppercase;letter-spacing:.2em;text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+
+/* Masthead */
+.mast{padding-block:44px 28px;text-align:center;display:grid;gap:18px;justify-items:center}
+.brand{font-size:clamp(22px,4.4vw,34px);letter-spacing:.32em;margin-right:-.32em}
+.nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 26px;font-size:14px;color:var(--muted)}
+.nav a{color:inherit;text-decoration:none}
+.nav a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.lang{display:inline-flex;gap:2px;align-items:center}
+.lang button{background:none;border:0;padding:2px 4px;color:var(--muted);font-size:14px}
+.lang button[aria-pressed="true"]{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:4px}
+.lang span{color:var(--hair)}
+
+/* Work area */
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;padding-block:40px 88px;align-items:start}
+.tag{font-size:clamp(20px,2.6vw,27px);line-height:1.3}
+.intro{max-width:46ch;margin:18px 0 0;color:var(--muted);font-size:15px}
+form{display:grid;gap:30px;margin-top:38px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
+legend{padding:0;margin-bottom:12px;display:flex;justify-content:space-between;width:100%;gap:12px;align-items:baseline}
+.lbl{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+.val{font-variant-numeric:lining-nums tabular-nums;color:var(--muted);font-size:14px}
+
+.stepper{display:inline-grid;grid-template-columns:52px 84px 52px;border:1px solid var(--line);width:max-content}
+.stepper button{background:none;border:0;height:52px;display:grid;place-items:center}
+.stepper button:hover{background:var(--ink);color:var(--paper)}
+.stepper button:disabled{opacity:.3;cursor:not-allowed;background:none;color:inherit}
+.stepper input{border:0;border-inline:1px solid var(--line);background:none;color:var(--ink);text-align:center;font:600 20px var(--body);font-variant-numeric:lining-nums tabular-nums;width:100%;-moz-appearance:textfield}
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:none;padding:9px 14px;font-size:14px;font-variant-numeric:lining-nums tabular-nums;min-width:68px}
+.chip:hover{background:var(--hair)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+input[type=range]{width:100%;accent-color:var(--ink);margin:4px 0 0}
+
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line)}
+.seg button{background:none;border:0;padding:14px 12px;text-align:left;display:grid;gap:2px;min-width:0}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button:hover{background:var(--hair)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg b{font-family:var(--display);font-stretch:125%;font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+.seg small{font-size:12.5px;opacity:.75;line-height:1.35}
+.seg.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+/* Result panel */
+.panel{background:var(--panel);color:var(--on-panel);padding:36px 34px 30px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);display:grid;gap:26px}
+.scale{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center}
+.scale svg{width:148px;height:148px;display:block}
+.balls{display:grid;gap:4px}
+.big{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:clamp(34px,4.6vw,52px);letter-spacing:.02em;line-height:1;font-variant-numeric:lining-nums tabular-nums}
+.big small{font-size:.42em;letter-spacing:.12em;margin-left:.15em}
+.sub{color:var(--on-panel-muted);font-size:14px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:lining-nums tabular-nums}
+th,td{padding:11px 0;border-bottom:1px solid var(--panel-hair);text-align:left;font-weight:500}
+th{font-family:var(--display);font-stretch:125%;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:800}
+td{text-align:right;font-size:18px}
+td.pct{color:var(--on-panel-muted);font-size:13px;width:64px}
+tr.total th,tr.total td{border-bottom:0;padding-top:16px}
+tr.total td{font-weight:600}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--on-panel);color:var(--panel);border:1px solid var(--on-panel);padding:12px 22px;font-weight:600;font-size:14px}
+.btn:hover{background:transparent;color:var(--on-panel)}
+.note{font-size:12.5px;color:var(--on-panel-muted);margin:0}
+.toast{font-size:13px;color:var(--on-panel-muted)}
+
+/* Method band */
+.band{background:var(--sage);color:var(--on-sage)}
+.band .wrap{padding-block:80px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:56px}
+.band h2{font-size:clamp(20px,2.4vw,26px);line-height:1.3}
+.band h2::after{content:"";display:block;width:64px;height:2px;background:var(--on-sage);margin-top:22px}
+.band p.lead{color:var(--on-sage-muted);max-width:36ch;margin:22px 0 0;font-size:15px}
+ol{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;gap:0}
+ol li{counter-increment:s;display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;padding-block:18px;border-top:1px solid color-mix(in srgb,var(--on-sage) 35%,transparent)}
+ol li::before{content:counter(s);font-family:var(--display);font-stretch:125%;font-weight:800;font-size:22px;line-height:1.2;font-variant-numeric:lining-nums}
+ol li b{display:block;font-weight:600}
+ol li span{color:var(--on-sage-muted);font-size:15px}
+
+footer .wrap{padding-block:56px 64px;display:grid;justify-items:center;gap:14px;text-align:center;font-size:13px;color:var(--muted)}
+footer h3{font-size:13px;color:var(--ink)}
+#install{border:1px solid var(--line);background:var(--ink);color:var(--paper);padding:11px 20px;font-weight:600;font-size:14px}
+#install:hover{background:none;color:var(--ink)}
+
+@media (max-width:860px){
+  .work{grid-template-columns:minmax(0,1fr);gap:40px}
+  .panel{position:static}
+  .band .wrap{grid-template-columns:minmax(0,1fr);gap:28px;padding-block:56px}
+}
+@media (max-width:440px){
+  .panel{padding:26px 20px 22px}
+  .scale svg{width:112px;height:112px}
+  .seg small{display:none}
+  .chip{min-width:0;padding:9px 11px}
+  .nav{gap:6px 18px}
+}
+@media (prefers-reduced-motion:no-preference){
+  #dia circle,#dia rect{transition:r .45s cubic-bezier(.16,1,.3,1),height .45s cubic-bezier(.16,1,.3,1),y .45s cubic-bezier(.16,1,.3,1)}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap mast">
+  <div class="display brand">Impasto</div>
+  <nav class="nav" aria-label="Menu">
+    <a href="#calc" data-t="navCalc">Calcolatore</a>
+    <a href="#metodo" data-t="navMethod">Metodo</a>
+    <div class="lang" role="group" aria-label="Lingua / Language">
+      <button type="button" id="l-it" data-lang="it" aria-pressed="true">IT</button><span aria-hidden="true">/</span><button type="button" id="l-en" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+<section class="wrap work" id="calc">
+  <div>
+    <h1 class="tag" data-t="tag">Farina.<br>Acqua.<br>Tempo.</h1>
+    <p class="intro" data-t="intro">Scegli quante pizze, il diametro e lo spessore. Il calcolo parte dalla superficie della pizza e restituisce le dosi in grammi, pronte da pesare.</p>
+
+    <form id="f" onsubmit="return false">
+      <fieldset>
+        <legend><span class="lbl" data-t="qty">Numero di pizze</span></legend>
+        <div class="stepper">
+          <button type="button" id="minus" aria-label="−1"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.6"/></svg></button>
+          <input id="n" type="number" inputmode="numeric" min="1" max="40" value="4" aria-label="Pizze">
+          <button type="button" id="plus" aria-label="+1"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="lbl" data-t="size">Diametro</span><span class="val" id="dval">30 cm</span></legend>
+        <div class="chips" id="chips"></div>
+        <input id="d" type="range" min="20" max="45" step="1" value="30" aria-label="cm">
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="lbl" data-t="thick">Spessore</span></legend>
+        <div class="seg" id="seg"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="lbl" data-t="yeast">Lievito</span></legend>
+        <div class="seg two" id="yseg"></div>
+      </fieldset>
+    </form>
+  </div>
+
+  <aside class="panel" aria-live="polite">
+    <div class="scale">
+      <svg id="dia" viewBox="0 0 160 160" role="img" aria-label="">
+        <circle cx="80" cy="72" r="68" fill="none" stroke="var(--panel-hair)" stroke-dasharray="2 4"/>
+        <circle id="pz" cx="80" cy="72" r="45" fill="var(--dough)" stroke="var(--dough-edge)" stroke-width="5"/>
+        <rect id="sec" x="20" y="150" width="120" height="4" fill="var(--dough)"/>
+      </svg>
+      <div class="balls">
+        <div class="sub" data-t="balls">Panetti</div>
+        <div class="big" id="ball">4 × 250<small>g</small></div>
+        <div class="sub" id="ballsub"></div>
+      </div>
+    </div>
+    <table>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="actions">
+      <button type="button" class="btn" id="copy" data-t="copy">Copia ricetta</button>
+      <span class="toast" id="toast" role="status"></span>
+    </div>
+    <p class="note" id="note"></p>
+  </aside>
+</section>
+
+<section class="band" id="metodo">
+  <div class="wrap">
+    <div>
+      <h2 data-t="method">Metodo</h2>
+      <p class="lead" data-t="methodLead">Una lavorazione a mano, con lievitazione a temperatura ambiente. I tempi indicati valgono intorno ai 22 °C.</p>
+    </div>
+    <ol id="steps"></ol>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3 data-t="foot">Impasto per pizza fatta in casa</h3>
+    <button type="button" id="install" hidden data-t="install">Installa l'app</button>
+    <div data-t="offline">Funziona anche offline una volta installata.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var T = {
+    it:{navCalc:"Calcolatore",navMethod:"Metodo",tag:"Farina.<br>Acqua.<br>Tempo.",
+      intro:"Scegli quante pizze, il diametro e lo spessore. Il calcolo parte dalla superficie della pizza e restituisce le dosi in grammi, pronte da pesare.",
+      qty:"Numero di pizze",size:"Diametro",thick:"Spessore",yeast:"Lievito",balls:"Panetti",copy:"Copia ricetta",copied:"Ricetta copiata",copyFail:"Copia non riuscita: seleziona il testo a mano",
+      method:"Metodo",methodLead:"Una lavorazione a mano, con lievitazione a temperatura ambiente. I tempi indicati valgono intorno ai 22 °C.",
+      foot:"Impasto per pizza fatta in casa",install:"Installa l'app",offline:"Funziona anche offline una volta installata.",
+      flour:"Farina",water:"Acqua",salt:"Sale",fresh:"Lievito fresco",dry:"Lievito secco",oil:"Olio EVO",total:"Totale",
+      th:{fine:["Fine","Sottile e croccante"],reg:["Regolare","Classica, cornicione morbido"],thick:["Grossa","Alta e soffice"]},
+      ys:{fresh:["Fresco","Cubetto di birra"],dry:["Secco","Lievito disidratato"]},
+      hyd:"idratazione",per:"a pizza",diaLabel:function(d){return "Pizza da "+d+" cm in scala"},
+      note:"Include un 2% in più per la pasta che resta nella ciotola. Percentuali sul peso della farina.",
+      steps:function(r){return [
+        ["Sciogli il lievito","Versa "+r.water+" g di acqua a temperatura ambiente in una ciotola e scioglici "+r.yeastTxt+"."],
+        ["Aggiungi la farina","Unisci "+r.flour+" g di farina poco alla volta, mescolando finché non resta farina asciutta."],
+        ["Sale"+(r.oil?" e olio":""),"Aggiungi "+r.salt+" g di sale"+(r.oil?" e "+r.oil+" g di olio":"")+" e impasta 10 minuti, finché l'impasto è liscio."],
+        ["Riposo e pieghe","Copri e lascia riposare 20 minuti, poi fai due giri di pieghe a distanza di 15 minuti."],
+        ["Prima lievitazione","Lascia lievitare coperto per circa 2 ore, finché il volume aumenta della metà."],
+        ["Staglio","Dividi in "+r.n+" panetti da "+r.ball+" g e chiudili ben tesi."],
+        ["Seconda lievitazione","Lascia i panetti coperti per 4–6 ore, finché sono gonfi e morbidi al tatto."],
+        ["Stesura e cottura","Stendi a mano fino a "+r.d+" cm e cuoci al massimo della temperatura del forno, su pietra o teglia ben calda."]
+      ]}},
+    en:{navCalc:"Calculator",navMethod:"Method",tag:"Flour.<br>Water.<br>Time.",
+      intro:"Choose how many pizzas, the diameter and the thickness. The calculation starts from the pizza's surface area and gives you every amount in grams, ready to weigh.",
+      qty:"Number of pizzas",size:"Diameter",thick:"Thickness",yeast:"Yeast",balls:"Dough balls",copy:"Copy recipe",copied:"Recipe copied",copyFail:"Copy failed: select the text by hand",
+      method:"Method",methodLead:"Mixed by hand and fermented at room temperature. Times assume a kitchen around 22 °C.",
+      foot:"Dough for homemade pizza",install:"Install the app",offline:"Works offline once installed.",
+      flour:"Flour",water:"Water",salt:"Salt",fresh:"Fresh yeast",dry:"Dry yeast",oil:"Olive oil",total:"Total",
+      th:{fine:["Thin","Crisp and thin"],reg:["Regular","Classic, soft rim"],thick:["Thick","Tall and airy"]},
+      ys:{fresh:["Fresh","Compressed cake"],dry:["Dry","Active dry"]},
+      hyd:"hydration",per:"each",diaLabel:function(d){return d+" cm pizza drawn to scale"},
+      note:"Includes 2% extra for dough left in the bowl. Percentages are of flour weight.",
+      steps:function(r){return [
+        ["Dissolve the yeast","Pour "+r.water+" g of room-temperature water into a bowl and dissolve "+r.yeastTxt+" in it."],
+        ["Add the flour","Add "+r.flour+" g of flour a little at a time, stirring until no dry flour is left."],
+        ["Salt"+(r.oil?" and oil":""),"Add "+r.salt+" g of salt"+(r.oil?" and "+r.oil+" g of oil":"")+" and knead for 10 minutes, until smooth."],
+        ["Rest and fold","Cover and rest 20 minutes, then give it two sets of folds 15 minutes apart."],
+        ["First rise","Let it rise covered for about 2 hours, until it grows by half."],
+        ["Divide","Divide into "+r.n+" balls of "+r.ball+" g and shape them tight."],
+        ["Second rise","Leave the balls covered for 4–6 hours, until puffy and soft to the touch."],
+        ["Stretch and bake","Stretch by hand to "+r.d+" cm and bake at your oven's highest setting, on a well-heated stone or tray."]
+      ]}}
+  };
+  // grams of dough per cm² of pizza, hydration, oil (% of flour)
+  var P = {fine:{g:.28,hyd:.60,oil:.02,h:2},reg:{g:.35,hyd:.65,oil:0,h:4},thick:{g:.48,hyd:.70,oil:.03,h:8}};
+  var SALT=.025, YEAST={fresh:.003,dry:.001}, LOSS=1.02, SIZES=[24,28,30,33,36];
+
+  var S={n:4,d:30,t:"reg",y:"fresh",lang:"it"};
+  try{var saved=JSON.parse(localStorage.getItem("impasto")||"null"); if(saved) Object.assign(S,saved); else if(!/^it/i.test(navigator.language||"it")) S.lang="en";}catch(e){}
+  function save(){try{localStorage.setItem("impasto",JSON.stringify(S))}catch(e){}}
+
+  var $=function(id){return document.getElementById(id)};
+  function fmt(x){ if(x<10) return (Math.round(x*10)/10).toLocaleString(S.lang==="it"?"it-IT":"en-GB"); return Math.round(x).toLocaleString(S.lang==="it"?"it-IT":"en-GB"); }
+
+  function calc(){
+    var p=P[S.t], area=Math.PI*Math.pow(S.d/2,2);
+    var ball=Math.round(area*p.g/5)*5;
+    var total=ball*S.n*LOSS;
+    var k=1+p.hyd+SALT+YEAST[S.y]+p.oil;
+    var flour=total/k;
+    return {ball:ball,flour:flour,water:flour*p.hyd,salt:flour*SALT,yeast:flour*YEAST[S.y],oil:flour*p.oil,total:total,p:p};
+  }
+
+  function buildControls(){
+    var L=T[S.lang];
+    $("chips").innerHTML=SIZES.map(function(s){return '<button type="button" class="chip" data-s="'+s+'" aria-pressed="'+(S.d===s)+'">'+s+' cm</button>'}).join("");
+    $("seg").innerHTML=["fine","reg","thick"].map(function(k){return '<button type="button" data-k="'+k+'" aria-pressed="'+(S.t===k)+'"><b>'+L.th[k][0]+'</b><small>'+L.th[k][1]+'</small></button>'}).join("");
+    $("yseg").innerHTML=["fresh","dry"].map(function(k){return '<button type="button" data-k="'+k+'" aria-pressed="'+(S.y===k)+'"><b>'+L.ys[k][0]+'</b><small>'+L.ys[k][1]+'</small></button>'}).join("");
+  }
+
+  function render(){
+    var L=T[S.lang], r=calc();
+    document.documentElement.lang=S.lang;
+    document.querySelectorAll("[data-t]").forEach(function(el){var v=L[el.dataset.t]; if(typeof v==="string") el.innerHTML=v;});
+    $("l-it").setAttribute("aria-pressed",S.lang==="it"); $("l-en").setAttribute("aria-pressed",S.lang==="en");
+    $("n").value=S.n; $("minus").disabled=S.n<=1; $("plus").disabled=S.n>=40;
+    $("d").value=S.d; $("dval").textContent=S.d+" cm";
+    buildControls();
+    $("ball").innerHTML=S.n+" × "+r.ball+"<small>g</small>";
+    $("ballsub").textContent=S.d+" cm · "+L.th[S.t][0]+" · "+Math.round(r.p.hyd*100)+"% "+L.hyd;
+    var rows=[[L.flour,r.flour,"100%"],[L.water,r.water,Math.round(r.p.hyd*100)+"%"],[L.salt,r.salt,"2,5%"],[S.y==="fresh"?L.fresh:L.dry,r.yeast,(YEAST[S.y]*100).toFixed(1)+"%"]];
+    if(r.oil) rows.push([L.oil,r.oil,Math.round(r.p.oil*100)+"%"]);
+    if(S.lang==="en") rows.forEach(function(x){x[2]=x[2].replace(",",".")});
+    else rows.forEach(function(x){x[2]=x[2].replace(".",",")});
+    $("rows").innerHTML=rows.map(function(x){return '<tr><th scope="row">'+x[0]+'</th><td class="pct">'+x[2]+'</td><td>'+fmt(x[1])+' g</td></tr>'}).join("")+
+      '<tr class="total"><th scope="row">'+L.total+'</th><td class="pct"></td><td>'+fmt(r.total)+' g</td></tr>';
+    $("note").textContent=L.note;
+    // diagram: outer ring = 45 cm
+    var rad=68*S.d/45; $("pz").setAttribute("r",rad.toFixed(1));
+    var h=r.p.h; $("sec").setAttribute("height",h); $("sec").setAttribute("y",158-h);
+    $("dia").setAttribute("aria-label",L.diaLabel(S.d));
+    var yeastTxt=fmt(r.yeast)+" g "+(S.y==="fresh"?L.fresh:L.dry).toLowerCase();
+    var st=L.steps({water:fmt(r.water),flour:fmt(r.flour),salt:fmt(r.salt),oil:r.oil?fmt(r.oil):0,yeastTxt:yeastTxt,n:S.n,ball:r.ball,d:S.d});
+    $("steps").innerHTML=st.map(function(s){return '<li><div><b>'+s[0]+'</b><span>'+s[1]+'</span></div></li>'}).join("");
+    save();
+  }
+
+  function setN(v){v=parseInt(v,10); if(isNaN(v)) return; S.n=Math.max(1,Math.min(40,v)); render();}
+  $("minus").onclick=function(){setN(S.n-1)}; $("plus").onclick=function(){setN(S.n+1)};
+  $("n").addEventListener("change",function(e){setN(e.target.value)});
+  $("d").addEventListener("input",function(e){S.d=+e.target.value; render();});
+  $("chips").addEventListener("click",function(e){var b=e.target.closest("[data-s]"); if(b){S.d=+b.dataset.s; render();}});
+  $("seg").addEventListener("click",function(e){var b=e.target.closest("[data-k]"); if(b){S.t=b.dataset.k; render(); $("seg").querySelector('[data-k="'+S.t+'"]').focus();}});
+  $("yseg").addEventListener("click",function(e){var b=e.target.closest("[data-k]"); if(b){S.y=b.dataset.k; render(); $("yseg").querySelector('[data-k="'+S.y+'"]').focus();}});
+  document.querySelectorAll("[data-lang]").forEach(function(b){b.onclick=function(){S.lang=b.dataset.lang; render();}});
+
+  $("copy").onclick=function(){
+    var L=T[S.lang], r=calc();
+    var txt=[S.n+" × "+S.d+" cm — "+L.th[S.t][0]+" ("+S.n+" × "+r.ball+" g)",
+      L.flour+": "+fmt(r.flour)+" g", L.water+": "+fmt(r.water)+" g", L.salt+": "+fmt(r.salt)+" g",
+      (S.y==="fresh"?L.fresh:L.dry)+": "+fmt(r.yeast)+" g"].concat(r.oil?[L.oil+": "+fmt(r.oil)+" g"]:[]).join("\n");
+    var t=$("toast");
+    function fail(){t.textContent=L.copyFail; var sel=window.getSelection(),rg=document.createRange(); rg.selectNodeContents($("rows")); sel.removeAllRanges(); sel.addRange(rg);}
+    try{navigator.clipboard.writeText(txt).then(function(){t.textContent=L.copied; setTimeout(function(){t.textContent=""},2400)},fail);}catch(e){fail()}
+  };
+
+  // PWA: install prompt + service worker (only where supported)
+  var deferred;
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault(); deferred=e; $("install").hidden=false;});
+  $("install").onclick=function(){ if(deferred){deferred.prompt(); deferred=null; $("install").hidden=true;} };
+  try{ if("serviceWorker" in navigator && document.querySelector('link[rel="manifest"]')) navigator.serviceWorker.register("sw.js").catch(function(){}); }catch(e){}
+
+  render();
+})();
+</script>
+</body>
+</html>
