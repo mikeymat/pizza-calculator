@@ -230,6 +230,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
   .opt .gw{font-size:13px}
   .yeast{gap:6px}
   .yeast .pill{height:46px;font-size:15px}
+  .stepper{max-width:260px}
   .results.g{position:sticky;top:calc(var(--hh) + env(safe-area-inset-top,0px) + 8px);max-height:calc(100dvh - var(--hh) - 18px);overflow:auto;border-radius:22px;padding:12px 16px 12px;gap:8px;align-self:start;overscroll-behavior:contain}
   .res-head{gap:10px;align-items:center}
   .res-head .k{font-size:14px}
@@ -280,7 +281,6 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
 
   <div class="work" id="calc">
     <form class="controls g" id="f" onsubmit="return false">
-      <div class="row2">
       <fieldset class="ctl">
         <legend><span class="lbl" data-t="qty">Quante pizze?</span></legend>
         <div class="stepper">
@@ -289,11 +289,6 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
           <button type="button" id="plus" aria-label="+1"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 11h14M11 4v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         </div>
       </fieldset>
-      <fieldset class="ctl">
-        <legend><span class="lbl" data-t="yeast">Lievito</span></legend>
-        <div class="yeast" id="yseg"></div>
-      </fieldset>
-      </div>
 
       <fieldset class="ctl">
         <legend><span class="lbl" data-t="size">Diametro</span><span class="val num" id="dval">30 cm</span></legend>
@@ -304,6 +299,10 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
       <fieldset class="ctl">
         <legend><span class="lbl" data-t="thick">Spessore</span></legend>
         <div class="opts" id="seg"></div>
+      </fieldset>
+      <fieldset class="ctl">
+        <legend><span class="lbl" data-t="yeast">Lievito</span></legend>
+        <div class="yeast" id="yseg"></div>
       </fieldset>
 
     </form>
