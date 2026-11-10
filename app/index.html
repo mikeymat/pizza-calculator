@@ -20,7 +20,7 @@
    with an arch-framed to-scale pizza, tomato method list, black footer with oversized sign-off. Desktop: controls | sticky results. */
 :root{
   --tomato:#c9431f; --tomato-deep:#a93617; --butter:#ffe974; --cream:#f7f6f3; --ink:#0d0d0c; --ink-soft:#3b2f12;
-  --dough:#f3e3bd; --dough-edge:#d29a55; --coral:#f08a6c;
+  --dough:#f3e3bd; --dough-edge:#c98a45; --sauce:#9a2410; --crust:#e8964a; --mozz:#fbf6e9; --basil:#3c7a35; --basil-vein:#8fc283; --char:#6b3a1a; --coral:#f08a6c;
   --font:"Outfit","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --ease:cubic-bezier(.16,1,.3,1);
   color-scheme:light;
@@ -42,7 +42,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 /* Header */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--tomato);display:flex;justify-content:space-between;align-items:center;padding-block:12px;gap:12px}
 .mark{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:22px;letter-spacing:-.035em;color:var(--butter);text-decoration:none;line-height:1}
-.mark svg{width:30px;height:30px;flex:none;transition:transform .5s var(--ease)}
+.mark svg{width:36px;height:36px;flex:none;transition:transform .5s var(--ease)}
 .mark:hover svg{transform:rotate(-30deg)}
 .toplinks{display:flex;align-items:center;gap:18px;font-size:15px}
 .toplinks a{color:var(--butter);text-decoration:none;display:none}
@@ -116,10 +116,12 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 .big{font-weight:800;font-size:clamp(56px,17vw,96px);letter-spacing:-.05em;line-height:.9;margin-top:6px;white-space:nowrap}
 .big small{font-size:.4em;letter-spacing:-.02em;margin-left:.08em}
 .meta{font-size:15px;color:var(--ink-soft);margin-top:10px}
-.arch{width:clamp(84px,26vw,112px);aspect-ratio:3/4;max-width:100%;background:var(--tomato);border-radius:999px 999px 0 0;overflow:hidden}
+.arch{width:clamp(100px,30vw,132px);aspect-ratio:3/4;max-width:100%;background:var(--tomato);border-radius:999px 999px 0 0;overflow:hidden}
 .arch svg{width:100%;height:100%;display:block}
-#pz,#sec{transition:r .5s var(--ease),height .5s var(--ease),y .5s var(--ease)}
-@media (prefers-reduced-motion:reduce){#pz,#sec,.pill,.opt,.bar{transition:none}}
+#pzg{transform-box:view-box;transform-origin:60px 66px;transition:transform .55s var(--ease)}
+#sauce{transition:r .4s var(--ease)}
+.diml{font-family:var(--font);font-weight:700;font-size:12px;letter-spacing:-.02em;fill:var(--butter)}
+@media (prefers-reduced-motion:reduce){#pzg,#sauce,.pill,.opt,.bar{transition:none}}
 
 .list{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
 .list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:baseline;padding-block:13px;border-bottom:1px solid color-mix(in srgb,var(--ink) 22%,transparent)}
@@ -173,7 +175,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
   .work{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:12px 72px}
   .controls.g{padding-left:0;padding-right:0}
   .results.g{padding:36px 36px 32px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);border-radius:28px}
-  .arch{width:124px}
+  .arch{width:148px}
   .bar{display:none}
   .sign{padding-bottom:24px}
   .method{grid-template-columns:minmax(0,1fr) minmax(0,2fr);column-gap:56px;align-items:start}
@@ -184,7 +186,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
 <body>
 
 <header class="top g">
-  <a class="mark" href="#calc"><svg viewBox="7 7 86 86" aria-hidden="true"><g stroke-linejoin="round"><path d="M50 50 L84 50 A34 34 0 1 1 67 20.56 Z" fill="var(--butter)" stroke="var(--dough)" stroke-width="6"/><path d="M50 50 L67 20.56 A34 34 0 0 1 84 50 Z" transform="translate(5.6 -3.2)" fill="var(--butter)" stroke="var(--dough)" stroke-width="6"/><path d="M50 50 L33 79.44 M50 50 L16 50 M50 50 L33 20.56 M50 50 L67 79.44" stroke="var(--tomato)" stroke-width="2.4" stroke-linecap="round"/></g></svg>Impasto</a>
+  <a class="mark" href="#calc"><svg viewBox="8 6 90 90" aria-hidden="true"><g stroke-linejoin="round"><path d="M50 50 L84 50 A34 34 0 1 1 67 20.56 Z" fill="var(--butter)" stroke="var(--crust)" stroke-width="8"/><path d="M50 50 L67 20.56 A34 34 0 0 1 84 50 Z" transform="translate(10 -6)" fill="var(--butter)" stroke="var(--crust)" stroke-width="8"/><circle cx="38" cy="40" r="6.5" fill="var(--tomato-deep)"/><circle cx="58" cy="66" r="6.5" fill="var(--tomato-deep)"/><circle cx="34" cy="62" r="5" fill="var(--tomato-deep)"/><circle cx="68" cy="35" r="4.5" fill="var(--tomato-deep)"/></g></svg>Impasto</a>
   <nav class="toplinks" aria-label="Menu">
     <a href="#calc" data-t="navCalc">Calcolatore</a>
     <a href="#metodo" data-t="navMethod">Metodo</a>
@@ -246,9 +248,18 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
         </div>
         <div class="arch">
           <svg id="dia" viewBox="0 0 120 160" role="img" aria-label="">
-            <circle cx="60" cy="88" r="50" fill="none" stroke="var(--butter)" stroke-opacity=".5" stroke-dasharray="2 5"/>
-            <circle id="pz" cx="60" cy="88" r="33" fill="var(--dough)" stroke="var(--dough-edge)" stroke-width="5"/>
-            <rect id="sec" x="18" y="150" width="84" height="4" rx="2" fill="var(--dough)"/>
+            <circle cx="60" cy="66" r="46" fill="none" stroke="var(--butter)" stroke-opacity=".45" stroke-dasharray="1.5 4"/>
+            <g id="pzg">
+              <circle cx="60" cy="66" r="44" fill="var(--dough)" stroke="var(--dough-edge)" stroke-width="1.2"/>
+              <circle cx="101.1" cy="74.7" r="1.4" fill="var(--char)"/><circle cx="87.6" cy="97.7" r="1.1" fill="var(--char)"/><circle cx="56.3" cy="107.8" r="1.6" fill="var(--char)"/><circle cx="27.8" cy="93.0" r="1.2" fill="var(--char)"/><circle cx="18.4" cy="60.2" r="1.5" fill="var(--char)"/><circle cx="30.8" cy="35.8" r="1.1" fill="var(--char)"/><circle cx="54.2" cy="24.4" r="1.4" fill="var(--char)"/><circle cx="84.1" cy="31.6" r="1.2" fill="var(--char)"/><circle cx="98.9" cy="50.3" r="1.6" fill="var(--char)"/>
+              <circle id="sauce" cx="60" cy="66" r="38" fill="var(--sauce)"/>
+              <ellipse cx="46" cy="50" rx="6.5" ry="5" transform="rotate(20 46 50)" fill="var(--mozz)"/><ellipse cx="75" cy="56" rx="6" ry="4.6" transform="rotate(-15 75 56)" fill="var(--mozz)"/><ellipse cx="56" cy="82" rx="7" ry="5" transform="rotate(10 56 82)" fill="var(--mozz)"/><ellipse cx="38" cy="72" rx="5.5" ry="4.4" transform="rotate(40 38 72)" fill="var(--mozz)"/><ellipse cx="72" cy="83" rx="5.2" ry="4.2" transform="rotate(-30 72 83)" fill="var(--mozz)"/><ellipse cx="60" cy="64" rx="4.6" ry="3.8" transform="rotate(0 60 64)" fill="var(--mozz)"/>
+              <g transform="rotate(-25 62 44)"><ellipse cx="62" cy="44" rx="5" ry="2.6" fill="var(--basil)"/><path d="M57.6 44H66.4" stroke="var(--basil-vein)" stroke-width=".6"/></g><g transform="rotate(35 47 64)"><ellipse cx="47" cy="64" rx="5" ry="2.6" fill="var(--basil)"/><path d="M42.6 64H51.4" stroke="var(--basil-vein)" stroke-width=".6"/></g><g transform="rotate(70 80 72)"><ellipse cx="80" cy="72" rx="5" ry="2.6" fill="var(--basil)"/><path d="M75.6 72H84.4" stroke="var(--basil-vein)" stroke-width=".6"/></g>
+            </g>
+            <g id="dim" stroke="var(--butter)" stroke-width="1.2" stroke-linecap="round"><path id="dimp" d="M22 116H98M22 112.5V119.5M98 112.5V119.5" fill="none"/></g>
+            <text id="diml" x="60" y="130" text-anchor="middle" class="diml">30 cm</text>
+            <path id="prof" d="" fill="var(--dough)" stroke="var(--dough-edge)" stroke-width=".9"/>
+            <path id="profs" d="" stroke="var(--sauce)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
           </svg>
         </div>
       </div>
@@ -295,7 +306,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
       flour:"Farina",water:"Acqua",salt:"Sale",fresh:"Lievito fresco",dry:"Lievito secco",oil:"Olio EVO",total:"Totale",
       th:{fine:["Fine","Sottile e croccante"],reg:["Regolare","Classica, cornicione morbido"],thick:["Grossa","Alta e soffice"]},
       ys:{fresh:"Fresco",dry:"Secco"},
-      hyd:"idratazione",diaLabel:function(d){return "Pizza da "+d+" cm in scala"},
+      hyd:"idratazione",diaLabel:function(d,t){return "Pizza da "+d+" cm in scala, spessore "+t.toLowerCase()},
       note:"Include un 2% in più per la pasta che resta nella ciotola. Percentuali sul peso della farina.",
       steps:function(r){return [
         ["Sciogli il lievito","Versa "+r.water+" g di acqua a temperatura ambiente in una ciotola e scioglici "+r.yeastTxt+"."],
@@ -316,7 +327,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
       flour:"Flour",water:"Water",salt:"Salt",fresh:"Fresh yeast",dry:"Dry yeast",oil:"Olive oil",total:"Total",
       th:{fine:["Thin","Crisp and thin"],reg:["Regular","Classic, soft rim"],thick:["Thick","Tall and airy"]},
       ys:{fresh:"Fresh",dry:"Dry"},
-      hyd:"hydration",diaLabel:function(d){return d+" cm pizza drawn to scale"},
+      hyd:"hydration",diaLabel:function(d,t){return d+" cm pizza drawn to scale, "+t.toLowerCase()+" crust"},
       note:"Includes 2% extra for dough left in the bowl. Percentages are of flour weight.",
       steps:function(r){return [
         ["Dissolve the yeast","Pour "+r.water+" g of room-temperature water into a bowl and dissolve "+r.yeastTxt+" in it."],
@@ -343,6 +354,17 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
   function pct(x){return (Math.round(x*1000)/10).toLocaleString(loc())+"%"}
   function ballFor(t){return Math.round(Math.PI*Math.pow(S.d/2,2)*P[t].g/5)*5}
 
+  // Diagram: top-down pizza to scale (dashed ring = 45 cm), dimension line, side profile by thickness
+  var RIM={fine:{rim:3,base:1.6,bump:2.6},reg:{rim:6,base:2.4,bump:6},thick:{rim:7,base:5,bump:8.5}};
+  function drawDia(p){
+    var k=RIM[S.t], sc=S.d/45, half=44*sc, x0=60-half, x1=60+half, y=148, h=k.base, b=k.bump, rw=Math.max(4,k.rim*1.1*sc+2);
+    $("pzg").style.transform="scale("+sc.toFixed(3)+")";
+    $("sauce").setAttribute("r",44-k.rim);
+    $("dimp").setAttribute("d","M"+x0+" 116H"+x1+"M"+x0+" 112.5V119.5M"+x1+" 112.5V119.5");
+    $("diml").textContent=S.d+" cm";
+    $("prof").setAttribute("d","M"+x0+" "+y+"C"+x0+" "+(y-b*1.35)+" "+(x0+rw)+" "+(y-b*1.35)+" "+(x0+rw)+" "+(y-h)+"L"+(x1-rw)+" "+(y-h)+"C"+(x1-rw)+" "+(y-b*1.35)+" "+x1+" "+(y-b*1.35)+" "+x1+" "+y+"Z");
+    $("profs").setAttribute("d","M"+(x0+rw+1.5)+" "+(y-h-.6)+"H"+(x1-rw-1.5));
+  }
   function calc(){
     var p=P[S.t], ball=ballFor(S.t), total=ball*S.n*LOSS;
     var flour=total/(1+p.hyd+SALT+YEAST[S.y]+p.oil);
@@ -371,10 +393,9 @@ footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hi
     $("note").textContent=L.note;
     $("barBig").textContent=S.n+" × "+r.ball+" g";
     $("barSub").textContent=L.flour+" "+fmt(r.flour)+" g · "+L.water+" "+fmt(r.water)+" g";
-    $("pz").setAttribute("r",(46*S.d/45).toFixed(1));
+    drawDia(r.p);
     $("d").style.setProperty("--fill",((S.d-20)/25*100)+"%");
-    $("sec").setAttribute("height",r.p.h); $("sec").setAttribute("y",156-r.p.h);
-    $("dia").setAttribute("aria-label",L.diaLabel(S.d));
+    $("dia").setAttribute("aria-label",L.diaLabel(S.d,L.th[S.t][0]));
     $("n").setAttribute("aria-label",L.qty); $("d").setAttribute("aria-label",L.size+" (cm)");
     $("minus").setAttribute("aria-label",L.less); $("plus").setAttribute("aria-label",L.more);
     if(lastLang!==S.lang){lastLang=S.lang; setWave(L.wave);}
