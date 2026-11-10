@@ -4,245 +4,285 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Calcolatore per l'impasto della pizza / Pizza dough calculator">
-<meta name="theme-color" content="#0f100e">
+<meta name="theme-color" content="#c9431f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Impasto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,800&family=Raleway:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
 <style>
-/* Layout: centered wide-tracked masthead, two-column work area (controls | inverted result panel), sage method band, quiet footer. */
+/* Layout (mobile first): tomato ground with giant butter headline, curved marquee, stacked controls, full-bleed butter result band
+   with an arch-framed to-scale pizza, tomato method list, black footer with oversized sign-off. Desktop: controls | sticky results. */
 :root{
-  --paper:#ffffff; --ink:#0f100e; --muted:#555b52; --line:#0f100e; --hair:#d9dcd5;
-  --sage:#6e7b65; --on-sage:#f5f6f1; --on-sage-muted:#dfe4d9;
-  --panel:#0f100e; --on-panel:#f5f6f1; --on-panel-muted:#b4b9ae; --panel-hair:#33372f;
-  --dough:#efe6d2; --dough-edge:#c9b48a;
-  --display:"Archivo","Arial Black","Helvetica Neue",sans-serif;
-  --body:"Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --tomato:#c9431f; --tomato-deep:#a93617; --butter:#ffe974; --cream:#f7f6f3; --ink:#0d0d0c; --ink-soft:#3b2f12;
+  --dough:#f3e3bd; --dough-edge:#d29a55; --coral:#f08a6c;
+  --font:"Outfit","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#121411; --ink:#eef0ea; --muted:#a4aa9f; --line:#eef0ea; --hair:#2e322b;
-  --sage:#4c5745; --on-sage:#f1f3ec; --on-sage-muted:#cfd6c8;
-  --panel:#e9ebe3; --on-panel:#121411; --on-panel-muted:#4f554b; --panel-hair:#c4c8bd;
-  --dough:#efe6d2; --dough-edge:#a8915f; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --paper:#121411; --ink:#eef0ea; --muted:#a4aa9f; --line:#eef0ea; --hair:#2e322b;
-  --sage:#4c5745; --on-sage:#f1f3ec; --on-sage-muted:#cfd6c8;
-  --panel:#e9ebe3; --on-panel:#121411; --on-panel-muted:#4f554b; --panel-hair:#c4c8bd;
-  --dough:#efe6d2; --dough-edge:#a8915f; color-scheme:dark}
-
 *{box-sizing:border-box}
-body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;margin:0;-webkit-font-smoothing:antialiased}
-::selection{background:var(--sage);color:var(--on-sage)}
-:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-h1,h2,h3,.display{font-family:var(--display);font-stretch:125%;font-weight:800;text-transform:uppercase;letter-spacing:.2em;text-wrap:balance;margin:0}
-button{font:inherit;color:inherit;cursor:pointer}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--tomato);color:var(--cream);font-family:var(--font);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--tomato)}
+::selection{background:var(--butter);color:var(--ink)}
+:focus-visible{outline:3px solid var(--butter);outline-offset:3px}
+.results :focus-visible{outline-color:var(--ink)}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+.g{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums lining-nums}
 
-/* Masthead */
-.mast{padding-block:44px 28px;text-align:center;display:grid;gap:18px;justify-items:center}
-.brand{font-size:clamp(22px,4.4vw,34px);letter-spacing:.32em;margin-right:-.32em}
-.nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 26px;font-size:14px;color:var(--muted)}
-.nav a{color:inherit;text-decoration:none}
-.nav a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
-.lang{display:inline-flex;gap:2px;align-items:center}
-.lang button{background:none;border:0;padding:2px 4px;color:var(--muted);font-size:14px}
-.lang button[aria-pressed="true"]{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:4px}
-.lang span{color:var(--hair)}
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--tomato);display:flex;justify-content:space-between;align-items:center;padding-block:12px;gap:12px}
+.mark{font-weight:700;font-size:21px;letter-spacing:-.03em;color:var(--butter);text-decoration:none}
+.toplinks{display:flex;align-items:center;gap:18px;font-size:15px}
+.toplinks a{color:var(--butter);text-decoration:none;display:none}
+.toplinks a:hover{text-decoration:underline;text-underline-offset:4px}
+.lang{display:inline-flex;border:1.5px solid var(--butter);border-radius:999px;padding:3px}
+.lang button{background:none;border:0;border-radius:999px;min-width:44px;height:36px;font-weight:600;font-size:14px;color:var(--butter)}
+.lang button[aria-pressed="true"]{background:var(--butter);color:var(--tomato-deep)}
+
+/* Hero */
+.hero{padding-block:8px 0}
+h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232px);line-height:.86;letter-spacing:-.045em;text-wrap:balance}
+.lede{display:grid;gap:12px;margin-top:24px}
+.lede h2{margin:0;color:var(--butter);font-size:clamp(26px,3.4vw,40px);line-height:1.02;letter-spacing:-.03em;font-weight:700}
+.lede h2 small{display:block;font-size:.62em;letter-spacing:-.02em;font-weight:600;margin-top:6px}
+.lede p{margin:0;color:var(--cream);max-width:44ch}
+
+/* Curved marquee */
+.wave{display:block;width:100%;height:clamp(64px,10vw,120px);margin-top:4px}
+.wave text{fill:var(--butter);font-family:var(--font);font-size:30px;font-weight:500;letter-spacing:-.01em}
 
 /* Work area */
-.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;padding-block:40px 88px;align-items:start}
-.tag{font-size:clamp(20px,2.6vw,27px);line-height:1.3}
-.intro{max-width:46ch;margin:18px 0 0;color:var(--muted);font-size:15px}
-form{display:grid;gap:30px;margin-top:38px}
-fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
-legend{padding:0;margin-bottom:12px;display:flex;justify-content:space-between;width:100%;gap:12px;align-items:baseline}
-.lbl{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:12px;letter-spacing:.2em;text-transform:uppercase}
-.val{font-variant-numeric:lining-nums tabular-nums;color:var(--muted);font-size:14px}
+.work{display:grid;grid-template-columns:minmax(0,1fr);align-items:start}
+.controls{display:grid;gap:30px;padding-block:20px 44px;margin:0}
+.ctl{display:grid;gap:12px;min-width:0;border:0;margin:0;padding:0}
+.ctl legend{padding:0;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;width:100%;gap:12px}
+.lbl{color:var(--butter);font-weight:700;font-size:25px;letter-spacing:-.03em;line-height:1.1}
+.val{font-size:16px;color:var(--cream);font-weight:500}
 
-.stepper{display:inline-grid;grid-template-columns:52px 84px 52px;border:1px solid var(--line);width:max-content}
-.stepper button{background:none;border:0;height:52px;display:grid;place-items:center}
-.stepper button:hover{background:var(--ink);color:var(--paper)}
-.stepper button:disabled{opacity:.3;cursor:not-allowed;background:none;color:inherit}
-.stepper input{border:0;border-inline:1px solid var(--line);background:none;color:var(--ink);text-align:center;font:600 20px var(--body);font-variant-numeric:lining-nums tabular-nums;width:100%;-moz-appearance:textfield}
-.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+.stepper{display:grid;grid-template-columns:60px minmax(0,1fr) 60px;align-items:center;border:1.5px solid var(--butter);border-radius:999px;max-width:300px;height:62px}
+.stepper button{height:58px;border:0;background:none;border-radius:999px;display:grid;place-items:center;color:var(--butter);transition:background .2s var(--ease),color .2s var(--ease),transform .15s var(--ease)}
+.stepper button:hover:not(:disabled){background:var(--butter);color:var(--tomato-deep)}
+.stepper button:active:not(:disabled){transform:scale(.92)}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper input{width:100%;min-width:0;border:0;background:none;text-align:center;color:var(--cream);font:700 30px var(--font);letter-spacing:-.02em;-moz-appearance:textfield;padding:0}
+.stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:1px solid var(--line);background:none;padding:9px 14px;font-size:14px;font-variant-numeric:lining-nums tabular-nums;min-width:68px}
-.chip:hover{background:var(--hair)}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-input[type=range]{width:100%;accent-color:var(--ink);margin:4px 0 0}
+.pills{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.pill{border:1.5px solid var(--butter);background:none;color:var(--butter);border-radius:999px;height:48px;padding:0 8px;font-weight:600;font-size:16px;white-space:nowrap;transition:background .25s var(--ease),color .25s var(--ease)}
+.pill:hover{background:color-mix(in srgb,var(--butter) 18%,transparent)}
+.pill[aria-pressed="true"]{background:var(--butter);color:var(--tomato-deep)}
+.range{width:100%;margin:8px 0 0;accent-color:var(--butter);height:36px}
 
-.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line)}
-.seg button{background:none;border:0;padding:14px 12px;text-align:left;display:grid;gap:2px;min-width:0}
-.seg button+button{border-left:1px solid var(--line)}
-.seg button:hover{background:var(--hair)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.seg b{font-family:var(--display);font-stretch:125%;font-size:12px;letter-spacing:.16em;text-transform:uppercase}
-.seg small{font-size:12.5px;opacity:.75;line-height:1.35}
-.seg.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:center;text-align:left;border:1.5px solid var(--butter);border-radius:28px;background:none;padding:12px 18px 12px 14px;min-height:68px;transition:background .25s var(--ease)}
+.opt:hover{background:color-mix(in srgb,var(--butter) 14%,transparent)}
+.opt svg{width:40px;height:40px;display:block}
+.opt b{display:block;color:var(--butter);font-weight:700;font-size:19px;letter-spacing:-.02em;line-height:1.15}
+.opt small{display:block;font-size:14.5px;color:var(--cream);line-height:1.3}
+.opt .gw{font-weight:600;font-size:16px;color:var(--butter)}
+.opt[aria-pressed="true"]{background:var(--butter)}
+.opt[aria-pressed="true"] b,.opt[aria-pressed="true"] .gw{color:var(--tomato-deep)}
+.opt[aria-pressed="true"] small{color:var(--ink-soft)}
+.ring{fill:var(--butter)}
+.opt[aria-pressed="true"] .ring{fill:var(--tomato-deep)}
+.yeast{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.yeast .pill{height:52px;width:100%;font-size:17px}
 
-/* Result panel */
-.panel{background:var(--panel);color:var(--on-panel);padding:36px 34px 30px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);display:grid;gap:26px}
-.scale{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center}
-.scale svg{width:148px;height:148px;display:block}
-.balls{display:grid;gap:4px}
-.big{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:clamp(34px,4.6vw,52px);letter-spacing:.02em;line-height:1;font-variant-numeric:lining-nums tabular-nums}
-.big small{font-size:.42em;letter-spacing:.12em;margin-left:.15em}
-.sub{color:var(--on-panel-muted);font-size:14px}
-table{width:100%;border-collapse:collapse;font-variant-numeric:lining-nums tabular-nums}
-th,td{padding:11px 0;border-bottom:1px solid var(--panel-hair);text-align:left;font-weight:500}
-th{font-family:var(--display);font-stretch:125%;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:800}
-td{text-align:right;font-size:18px}
-td.pct{color:var(--on-panel-muted);font-size:13px;width:64px}
-tr.total th,tr.total td{border-bottom:0;padding-top:16px}
-tr.total td{font-weight:600}
-.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.btn{background:var(--on-panel);color:var(--panel);border:1px solid var(--on-panel);padding:12px 22px;font-weight:600;font-size:14px}
-.btn:hover{background:transparent;color:var(--on-panel)}
-.note{font-size:12.5px;color:var(--on-panel-muted);margin:0}
-.toast{font-size:13px;color:var(--on-panel-muted)}
+/* Results */
+.results{background:var(--butter);color:var(--ink);padding-block:40px;display:grid;gap:24px;scroll-margin-top:64px}
+.res-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end}
+.res-head .k{font-size:15px;font-weight:600;color:var(--ink-soft)}
+.big{font-weight:800;font-size:clamp(50px,14.5vw,84px);letter-spacing:-.05em;line-height:.9;margin-top:6px;white-space:nowrap}
+.big small{font-size:.4em;letter-spacing:-.02em;margin-left:.08em}
+.meta{font-size:15px;color:var(--ink-soft);margin-top:10px}
+.arch{width:104px;aspect-ratio:3/4;max-width:100%;background:var(--tomato);border-radius:999px 999px 0 0;overflow:hidden}
+.arch svg{width:100%;height:100%;display:block}
+#pz,#sec{transition:r .5s var(--ease),height .5s var(--ease),y .5s var(--ease)}
+@media (prefers-reduced-motion:reduce){#pz,#sec,.pill,.opt,.bar{transition:none}}
 
-/* Method band */
-.band{background:var(--sage);color:var(--on-sage)}
-.band .wrap{padding-block:80px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:56px}
-.band h2{font-size:clamp(20px,2.4vw,26px);line-height:1.3}
-.band h2::after{content:"";display:block;width:64px;height:2px;background:var(--on-sage);margin-top:22px}
-.band p.lead{color:var(--on-sage-muted);max-width:36ch;margin:22px 0 0;font-size:15px}
-ol{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;gap:0}
-ol li{counter-increment:s;display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;padding-block:18px;border-top:1px solid color-mix(in srgb,var(--on-sage) 35%,transparent)}
-ol li::before{content:counter(s);font-family:var(--display);font-stretch:125%;font-weight:800;font-size:22px;line-height:1.2;font-variant-numeric:lining-nums}
-ol li b{display:block;font-weight:600}
-ol li span{color:var(--on-sage-muted);font-size:15px}
+.list{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:baseline;padding-block:13px;border-bottom:1px solid color-mix(in srgb,var(--ink) 22%,transparent)}
+.list .n{font-weight:600;font-size:18px;letter-spacing:-.01em;min-width:0}
+.list .p{font-size:14px;color:var(--ink-soft);text-align:right}
+.list .w{font-weight:700;font-size:24px;letter-spacing:-.03em;min-width:86px;text-align:right}
+.list li.tot{border-bottom:0}
+.list li.tot .n,.list li.tot .w{font-weight:800}
+.res-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{height:52px;padding:0 26px;border-radius:999px;border:1.5px solid var(--ink);background:var(--ink);color:var(--butter);font-weight:600;font-size:16px}
+.btn:hover{background:none;color:var(--ink)}
+.toast{font-size:14px;font-weight:500}
+.note{margin:0;font-size:14px;color:var(--ink-soft);max-width:52ch}
 
-footer .wrap{padding-block:56px 64px;display:grid;justify-items:center;gap:14px;text-align:center;font-size:13px;color:var(--muted)}
-footer h3{font-size:13px;color:var(--ink)}
-#install{border:1px solid var(--line);background:var(--ink);color:var(--paper);padding:11px 20px;font-weight:600;font-size:14px}
-#install:hover{background:none;color:var(--ink)}
+/* Mobile summary bar */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--ink);color:var(--cream);display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  transition:transform .4s var(--ease)}
+.bar.off{transform:translateY(110%)}
+.bar .t{min-width:0;line-height:1.2}
+.bar .t b{display:block;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--butter)}
+.bar .t span{display:block;font-size:13.5px;color:#d9d6cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar a{flex:none;height:46px;padding:0 20px;border-radius:999px;background:var(--butter);color:var(--ink);display:inline-flex;align-items:center;font-weight:600;text-decoration:none;font-size:15px}
 
-@media (max-width:860px){
-  .work{grid-template-columns:minmax(0,1fr);gap:40px}
-  .panel{position:static}
-  .band .wrap{grid-template-columns:minmax(0,1fr);gap:28px;padding-block:56px}
+/* Method */
+.method{padding-block:60px 64px;display:grid;gap:24px;scroll-margin-top:60px}
+.method h2{margin:0;color:var(--butter);font-weight:700;font-size:clamp(44px,11vw,92px);letter-spacing:-.045em;line-height:.92;text-wrap:balance}
+.method .lead{margin:0;max-width:40ch;color:var(--cream)}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding-block:18px;border-top:1.5px solid color-mix(in srgb,var(--butter) 55%,transparent)}
+.steps li::before{content:counter(s);color:var(--butter);font-weight:800;font-size:32px;line-height:1;letter-spacing:-.04em}
+.steps b{display:block;color:var(--butter);font-weight:700;font-size:20px;letter-spacing:-.02em;line-height:1.2;margin-bottom:4px}
+.steps span{color:var(--cream)}
+
+/* Footer */
+footer{background:var(--ink);color:var(--cream);padding-block:40px 0;overflow:hidden}
+.foot-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px 32px;align-items:center;font-size:15px}
+.foot-row p{margin:0;max-width:40ch;color:#d9d6cf}
+#install{height:48px;padding:0 22px;border-radius:999px;border:1.5px solid var(--coral);background:none;color:var(--coral);font-weight:600}
+#install:hover{background:var(--coral);color:var(--ink)}
+.sign{margin-top:28px;font-weight:700;font-size:min(13.6vw,220px);letter-spacing:-.05em;line-height:.9;color:var(--cream);white-space:nowrap;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+
+@media (min-width:720px){
+  .toplinks a{display:inline}
+  .lede{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:40px}
+  .steps{display:grid;grid-template-columns:1fr 1fr;column-gap:40px}
+  .pills{display:flex;flex-wrap:wrap}
+  .pill{padding:0 18px}
 }
-@media (max-width:440px){
-  .panel{padding:26px 20px 22px}
-  .scale svg{width:112px;height:112px}
-  .seg small{display:none}
-  .chip{min-width:0;padding:9px 11px}
-  .nav{gap:6px 18px}
-}
-@media (prefers-reduced-motion:no-preference){
-  #dia circle,#dia rect{transition:r .45s cubic-bezier(.16,1,.3,1),height .45s cubic-bezier(.16,1,.3,1),y .45s cubic-bezier(.16,1,.3,1)}
+@media (min-width:960px){
+  .work{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:12px 72px}
+  .controls.g{padding-left:0;padding-right:0}
+  .results.g{padding:36px 36px 32px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);border-radius:28px}
+  .arch{width:124px}
+  .bar{display:none}
+  .sign{padding-bottom:24px}
+  .method{grid-template-columns:minmax(0,1fr) minmax(0,2fr);column-gap:56px;align-items:start}
+  .method h2{grid-row:span 2}
 }
 </style>
 </head>
 <body>
 
-<header class="wrap mast">
-  <div class="display brand">Impasto</div>
-  <nav class="nav" aria-label="Menu">
+<header class="top g">
+  <a class="mark" href="#calc">Impasto</a>
+  <nav class="toplinks" aria-label="Menu">
     <a href="#calc" data-t="navCalc">Calcolatore</a>
     <a href="#metodo" data-t="navMethod">Metodo</a>
     <div class="lang" role="group" aria-label="Lingua / Language">
-      <button type="button" id="l-it" data-lang="it" aria-pressed="true">IT</button><span aria-hidden="true">/</span><button type="button" id="l-en" data-lang="en" aria-pressed="false">EN</button>
+      <button type="button" id="l-it" data-lang="it" aria-pressed="true">IT</button>
+      <button type="button" id="l-en" data-lang="en" aria-pressed="false">EN</button>
     </div>
   </nav>
 </header>
 
 <main>
-<section class="wrap work" id="calc">
-  <div>
-    <h1 class="tag" data-t="tag">Farina.<br>Acqua.<br>Tempo.</h1>
-    <p class="intro" data-t="intro">Scegli quante pizze, il diametro e lo spessore. Il calcolo parte dalla superficie della pizza e restituisce le dosi in grammi, pronte da pesare.</p>
+  <section class="hero g">
+    <h1 data-t="h1">Pizza è vita</h1>
+    <div class="lede">
+      <h2><span data-t="sub1">Calcola l'impasto</span><small data-t="sub2">Grammi esatti, zero avanzi.</small></h2>
+      <p data-t="intro">Scegli quante pizze, il diametro e lo spessore. Il calcolo parte dalla superficie della pizza e ti dà ogni ingrediente in grammi.</p>
+    </div>
+  </section>
 
-    <form id="f" onsubmit="return false">
-      <fieldset>
-        <legend><span class="lbl" data-t="qty">Numero di pizze</span></legend>
+  <svg class="wave" viewBox="0 0 1200 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path id="wv" d="M-1800 70 C -1650 10, -1500 10, -1350 70 S -1050 130, -900 70 S -600 10, -450 70 S -150 130, 0 70 S 300 10, 450 70 S 750 130, 900 70 S 1200 10, 1350 70 S 1650 130, 1800 70" fill="none"/>
+    <text><textPath id="wvt" href="#wv" startOffset="0">Farina • Acqua • Sale • Lievito • Tempo •</textPath></text>
+  </svg>
+
+  <div class="work" id="calc">
+    <form class="controls g" id="f" onsubmit="return false">
+      <fieldset class="ctl">
+        <legend><span class="lbl" data-t="qty">Quante pizze?</span></legend>
         <div class="stepper">
-          <button type="button" id="minus" aria-label="−1"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.6"/></svg></button>
-          <input id="n" type="number" inputmode="numeric" min="1" max="40" value="4" aria-label="Pizze">
-          <button type="button" id="plus" aria-label="+1"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.6"/></svg></button>
+          <button type="button" id="minus" aria-label="−1"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 11h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+          <input id="n" class="num" type="number" inputmode="numeric" pattern="[0-9]*" min="1" max="40" value="4" aria-label="Pizze">
+          <button type="button" id="plus" aria-label="+1"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 11h14M11 4v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend><span class="lbl" data-t="size">Diametro</span><span class="val" id="dval">30 cm</span></legend>
-        <div class="chips" id="chips"></div>
-        <input id="d" type="range" min="20" max="45" step="1" value="30" aria-label="cm">
+      <fieldset class="ctl">
+        <legend><span class="lbl" data-t="size">Diametro</span><span class="val num" id="dval">30 cm</span></legend>
+        <div class="pills" id="chips"></div>
+        <input id="d" class="range" type="range" min="20" max="45" step="1" value="30" aria-label="cm">
       </fieldset>
 
-      <fieldset>
+      <fieldset class="ctl">
         <legend><span class="lbl" data-t="thick">Spessore</span></legend>
-        <div class="seg" id="seg"></div>
+        <div class="opts" id="seg"></div>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="ctl">
         <legend><span class="lbl" data-t="yeast">Lievito</span></legend>
-        <div class="seg two" id="yseg"></div>
+        <div class="yeast" id="yseg"></div>
       </fieldset>
     </form>
-  </div>
 
-  <aside class="panel" aria-live="polite">
-    <div class="scale">
-      <svg id="dia" viewBox="0 0 160 160" role="img" aria-label="">
-        <circle cx="80" cy="72" r="68" fill="none" stroke="var(--panel-hair)" stroke-dasharray="2 4"/>
-        <circle id="pz" cx="80" cy="72" r="45" fill="var(--dough)" stroke="var(--dough-edge)" stroke-width="5"/>
-        <rect id="sec" x="20" y="150" width="120" height="4" fill="var(--dough)"/>
-      </svg>
-      <div class="balls">
-        <div class="sub" data-t="balls">Panetti</div>
-        <div class="big" id="ball">4 × 250<small>g</small></div>
-        <div class="sub" id="ballsub"></div>
+    <section class="results g" id="dosi" aria-live="polite">
+      <div class="res-head">
+        <div>
+          <div class="k" data-t="balls">Panetti</div>
+          <div class="big num" id="ball">4 × 250<small>g</small></div>
+          <div class="meta" id="ballsub"></div>
+        </div>
+        <div class="arch">
+          <svg id="dia" viewBox="0 0 120 160" role="img" aria-label="">
+            <circle cx="60" cy="88" r="50" fill="none" stroke="var(--butter)" stroke-opacity=".5" stroke-dasharray="2 5"/>
+            <circle id="pz" cx="60" cy="88" r="33" fill="var(--dough)" stroke="var(--dough-edge)" stroke-width="5"/>
+            <rect id="sec" x="18" y="150" width="84" height="4" rx="2" fill="var(--dough)"/>
+          </svg>
+        </div>
       </div>
-    </div>
-    <table>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="actions">
-      <button type="button" class="btn" id="copy" data-t="copy">Copia ricetta</button>
-      <span class="toast" id="toast" role="status"></span>
-    </div>
-    <p class="note" id="note"></p>
-  </aside>
-</section>
-
-<section class="band" id="metodo">
-  <div class="wrap">
-    <div>
-      <h2 data-t="method">Metodo</h2>
-      <p class="lead" data-t="methodLead">Una lavorazione a mano, con lievitazione a temperatura ambiente. I tempi indicati valgono intorno ai 22 °C.</p>
-    </div>
-    <ol id="steps"></ol>
+      <ul class="list num" id="rows"></ul>
+      <div class="res-actions">
+        <button type="button" class="btn" id="copy" data-t="copy">Copia ricetta</button>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+      <p class="note" id="note"></p>
+    </section>
   </div>
-</section>
+
+  <section class="method g" id="metodo">
+    <h2 data-t="method">Come si fa</h2>
+    <p class="lead" data-t="methodLead">Lavorazione a mano, lievitazione a temperatura ambiente. I tempi valgono per una cucina intorno ai 22 °C.</p>
+    <ol class="steps" id="steps"></ol>
+  </section>
 </main>
 
 <footer>
-  <div class="wrap">
-    <h3 data-t="foot">Impasto per pizza fatta in casa</h3>
-    <button type="button" id="install" hidden data-t="install">Installa l'app</button>
-    <div data-t="offline">Funziona anche offline una volta installata.</div>
+  <div class="g">
+    <div class="foot-row">
+      <p data-t="offline">Installala sul telefono: funziona anche senza connessione.</p>
+      <button type="button" id="install" hidden data-t="install">Installa l'app</button>
+    </div>
   </div>
+  <div class="sign g" data-t="sign" aria-hidden="true">Buona pizza.</div>
 </footer>
+
+<div class="bar" id="bar">
+  <div class="t"><b class="num" id="barBig">4 × 250 g</b><span class="num" id="barSub"></span></div>
+  <a href="#dosi" data-t="see">Vedi dosi</a>
+</div>
 
 <script>
 (function(){
   var T = {
-    it:{navCalc:"Calcolatore",navMethod:"Metodo",tag:"Farina.<br>Acqua.<br>Tempo.",
-      intro:"Scegli quante pizze, il diametro e lo spessore. Il calcolo parte dalla superficie della pizza e restituisce le dosi in grammi, pronte da pesare.",
-      qty:"Numero di pizze",size:"Diametro",thick:"Spessore",yeast:"Lievito",balls:"Panetti",copy:"Copia ricetta",copied:"Ricetta copiata",copyFail:"Copia non riuscita: seleziona il testo a mano",
-      method:"Metodo",methodLead:"Una lavorazione a mano, con lievitazione a temperatura ambiente. I tempi indicati valgono intorno ai 22 °C.",
-      foot:"Impasto per pizza fatta in casa",install:"Installa l'app",offline:"Funziona anche offline una volta installata.",
+    it:{navCalc:"Calcolatore",navMethod:"Metodo",h1:"Pizza è vita",sub1:"Calcola l'impasto",sub2:"Grammi esatti, zero avanzi.",
+      intro:"Scegli quante pizze, il diametro e lo spessore. Il calcolo parte dalla superficie della pizza e ti dà ogni ingrediente in grammi.",
+      qty:"Quante pizze?",size:"Diametro",thick:"Spessore",yeast:"Lievito",balls:"Panetti",copy:"Copia ricetta",copied:"Ricetta copiata",copyFail:"Copia non riuscita: seleziona il testo a mano",
+      method:"Come si fa",methodLead:"Lavorazione a mano, lievitazione a temperatura ambiente. I tempi valgono per una cucina intorno ai 22 °C.",
+      install:"Installa l'app",offline:"Installala sul telefono: funziona anche senza connessione.",sign:"Buona pizza.",see:"Vedi dosi",
+      wave:"Farina • Acqua • Sale • Lievito • Tempo • ",
       flour:"Farina",water:"Acqua",salt:"Sale",fresh:"Lievito fresco",dry:"Lievito secco",oil:"Olio EVO",total:"Totale",
       th:{fine:["Fine","Sottile e croccante"],reg:["Regolare","Classica, cornicione morbido"],thick:["Grossa","Alta e soffice"]},
-      ys:{fresh:["Fresco","Cubetto di birra"],dry:["Secco","Lievito disidratato"]},
-      hyd:"idratazione",per:"a pizza",diaLabel:function(d){return "Pizza da "+d+" cm in scala"},
+      ys:{fresh:"Fresco",dry:"Secco"},
+      hyd:"idratazione",diaLabel:function(d){return "Pizza da "+d+" cm in scala"},
       note:"Include un 2% in più per la pasta che resta nella ciotola. Percentuali sul peso della farina.",
       steps:function(r){return [
         ["Sciogli il lievito","Versa "+r.water+" g di acqua a temperatura ambiente in una ciotola e scioglici "+r.yeastTxt+"."],
@@ -254,15 +294,16 @@ footer h3{font-size:13px;color:var(--ink)}
         ["Seconda lievitazione","Lascia i panetti coperti per 4–6 ore, finché sono gonfi e morbidi al tatto."],
         ["Stesura e cottura","Stendi a mano fino a "+r.d+" cm e cuoci al massimo della temperatura del forno, su pietra o teglia ben calda."]
       ]}},
-    en:{navCalc:"Calculator",navMethod:"Method",tag:"Flour.<br>Water.<br>Time.",
-      intro:"Choose how many pizzas, the diameter and the thickness. The calculation starts from the pizza's surface area and gives you every amount in grams, ready to weigh.",
-      qty:"Number of pizzas",size:"Diameter",thick:"Thickness",yeast:"Yeast",balls:"Dough balls",copy:"Copy recipe",copied:"Recipe copied",copyFail:"Copy failed: select the text by hand",
-      method:"Method",methodLead:"Mixed by hand and fermented at room temperature. Times assume a kitchen around 22 °C.",
-      foot:"Dough for homemade pizza",install:"Install the app",offline:"Works offline once installed.",
+    en:{navCalc:"Calculator",navMethod:"Method",h1:"Pizza is life",sub1:"Work out your dough",sub2:"Exact grams, nothing left over.",
+      intro:"Choose how many pizzas, the diameter and the thickness. The calculation starts from the pizza's surface area and gives you every ingredient in grams.",
+      qty:"How many pizzas?",size:"Diameter",thick:"Thickness",yeast:"Yeast",balls:"Dough balls",copy:"Copy recipe",copied:"Recipe copied",copyFail:"Copy failed: select the text by hand",
+      method:"How to make it",methodLead:"Mixed by hand and fermented at room temperature. Times assume a kitchen around 22 °C.",
+      install:"Install the app",offline:"Install it on your phone: it works without a connection too.",sign:"Happy baking.",see:"See amounts",
+      wave:"Flour • Water • Salt • Yeast • Time • ",
       flour:"Flour",water:"Water",salt:"Salt",fresh:"Fresh yeast",dry:"Dry yeast",oil:"Olive oil",total:"Total",
       th:{fine:["Thin","Crisp and thin"],reg:["Regular","Classic, soft rim"],thick:["Thick","Tall and airy"]},
-      ys:{fresh:["Fresh","Compressed cake"],dry:["Dry","Active dry"]},
-      hyd:"hydration",per:"each",diaLabel:function(d){return d+" cm pizza drawn to scale"},
+      ys:{fresh:"Fresh",dry:"Dry"},
+      hyd:"hydration",diaLabel:function(d){return d+" cm pizza drawn to scale"},
       note:"Includes 2% extra for dough left in the bowl. Percentages are of flour weight.",
       steps:function(r){return [
         ["Dissolve the yeast","Pour "+r.water+" g of room-temperature water into a bowl and dissolve "+r.yeastTxt+" in it."],
@@ -275,8 +316,8 @@ footer h3{font-size:13px;color:var(--ink)}
         ["Stretch and bake","Stretch by hand to "+r.d+" cm and bake at your oven's highest setting, on a well-heated stone or tray."]
       ]}}
   };
-  // grams of dough per cm² of pizza, hydration, oil (% of flour)
-  var P = {fine:{g:.28,hyd:.60,oil:.02,h:2},reg:{g:.35,hyd:.65,oil:0,h:4},thick:{g:.48,hyd:.70,oil:.03,h:8}};
+  // grams of dough per cm² of pizza, hydration and oil (% of flour), drawn thickness
+  var P={fine:{g:.28,hyd:.60,oil:.02,h:2},reg:{g:.35,hyd:.65,oil:0,h:4},thick:{g:.48,hyd:.70,oil:.03,h:8}};
   var SALT=.025, YEAST={fresh:.003,dry:.001}, LOSS=1.02, SIZES=[24,28,30,33,36];
 
   var S={n:4,d:30,t:"reg",y:"fresh",lang:"it"};
@@ -284,77 +325,87 @@ footer h3{font-size:13px;color:var(--ink)}
   function save(){try{localStorage.setItem("impasto",JSON.stringify(S))}catch(e){}}
 
   var $=function(id){return document.getElementById(id)};
-  function fmt(x){ if(x<10) return (Math.round(x*10)/10).toLocaleString(S.lang==="it"?"it-IT":"en-GB"); return Math.round(x).toLocaleString(S.lang==="it"?"it-IT":"en-GB"); }
+  function loc(){return S.lang==="it"?"it-IT":"en-GB"}
+  function fmt(x){return x<10?(Math.round(x*10)/10).toLocaleString(loc()):Math.round(x).toLocaleString(loc())}
+  function pct(x){return (Math.round(x*1000)/10).toLocaleString(loc())+"%"}
+  function ballFor(t){return Math.round(Math.PI*Math.pow(S.d/2,2)*P[t].g/5)*5}
 
   function calc(){
-    var p=P[S.t], area=Math.PI*Math.pow(S.d/2,2);
-    var ball=Math.round(area*p.g/5)*5;
-    var total=ball*S.n*LOSS;
-    var k=1+p.hyd+SALT+YEAST[S.y]+p.oil;
-    var flour=total/k;
+    var p=P[S.t], ball=ballFor(S.t), total=ball*S.n*LOSS;
+    var flour=total/(1+p.hyd+SALT+YEAST[S.y]+p.oil);
     return {ball:ball,flour:flour,water:flour*p.hyd,salt:flour*SALT,yeast:flour*YEAST[S.y],oil:flour*p.oil,total:total,p:p};
   }
+  function icon(k){var h=P[k].h*1.6+2;return '<svg viewBox="0 0 40 40" aria-hidden="true"><rect class="ring" x="3" y="'+(20-h/2)+'" width="34" height="'+h+'" rx="'+(h/2)+'"/></svg>'}
 
-  function buildControls(){
-    var L=T[S.lang];
-    $("chips").innerHTML=SIZES.map(function(s){return '<button type="button" class="chip" data-s="'+s+'" aria-pressed="'+(S.d===s)+'">'+s+' cm</button>'}).join("");
-    $("seg").innerHTML=["fine","reg","thick"].map(function(k){return '<button type="button" data-k="'+k+'" aria-pressed="'+(S.t===k)+'"><b>'+L.th[k][0]+'</b><small>'+L.th[k][1]+'</small></button>'}).join("");
-    $("yseg").innerHTML=["fresh","dry"].map(function(k){return '<button type="button" data-k="'+k+'" aria-pressed="'+(S.y===k)+'"><b>'+L.ys[k][0]+'</b><small>'+L.ys[k][1]+'</small></button>'}).join("");
-  }
-
+  var lastLang;
   function render(){
     var L=T[S.lang], r=calc();
     document.documentElement.lang=S.lang;
-    document.querySelectorAll("[data-t]").forEach(function(el){var v=L[el.dataset.t]; if(typeof v==="string") el.innerHTML=v;});
+    document.querySelectorAll("[data-t]").forEach(function(el){var v=L[el.dataset.t]; if(typeof v==="string") el.textContent=v;});
     $("l-it").setAttribute("aria-pressed",S.lang==="it"); $("l-en").setAttribute("aria-pressed",S.lang==="en");
     $("n").value=S.n; $("minus").disabled=S.n<=1; $("plus").disabled=S.n>=40;
     $("d").value=S.d; $("dval").textContent=S.d+" cm";
-    buildControls();
+    $("chips").innerHTML=SIZES.map(function(s){return '<button type="button" class="pill num" data-s="'+s+'" aria-pressed="'+(S.d===s)+'">'+s+'<span aria-hidden="true"> cm</span></button>'}).join("");
+    $("seg").innerHTML=["fine","reg","thick"].map(function(k){return '<button type="button" class="opt" data-k="'+k+'" aria-pressed="'+(S.t===k)+'">'+icon(k)+'<span><b>'+L.th[k][0]+'</b><small>'+L.th[k][1]+'</small></span><span class="gw num">'+ballFor(k)+' g</span></button>'}).join("");
+    $("yseg").innerHTML=["fresh","dry"].map(function(k){return '<button type="button" class="pill" data-k="'+k+'" aria-pressed="'+(S.y===k)+'">'+L.ys[k]+'</button>'}).join("");
     $("ball").innerHTML=S.n+" × "+r.ball+"<small>g</small>";
     $("ballsub").textContent=S.d+" cm · "+L.th[S.t][0]+" · "+Math.round(r.p.hyd*100)+"% "+L.hyd;
-    var rows=[[L.flour,r.flour,"100%"],[L.water,r.water,Math.round(r.p.hyd*100)+"%"],[L.salt,r.salt,"2,5%"],[S.y==="fresh"?L.fresh:L.dry,r.yeast,(YEAST[S.y]*100).toFixed(1)+"%"]];
-    if(r.oil) rows.push([L.oil,r.oil,Math.round(r.p.oil*100)+"%"]);
-    if(S.lang==="en") rows.forEach(function(x){x[2]=x[2].replace(",",".")});
-    else rows.forEach(function(x){x[2]=x[2].replace(".",",")});
-    $("rows").innerHTML=rows.map(function(x){return '<tr><th scope="row">'+x[0]+'</th><td class="pct">'+x[2]+'</td><td>'+fmt(x[1])+' g</td></tr>'}).join("")+
-      '<tr class="total"><th scope="row">'+L.total+'</th><td class="pct"></td><td>'+fmt(r.total)+' g</td></tr>';
+    var rows=[[L.flour,r.flour,"100%"],[L.water,r.water,pct(r.p.hyd)],[L.salt,r.salt,pct(SALT)],[S.y==="fresh"?L.fresh:L.dry,r.yeast,pct(YEAST[S.y])]];
+    if(r.oil) rows.push([L.oil,r.oil,pct(r.p.oil)]);
+    $("rows").innerHTML=rows.map(function(x){return '<li><span class="n">'+x[0]+'</span><span class="p">'+x[2]+'</span><span class="w">'+fmt(x[1])+' g</span></li>'}).join("")+
+      '<li class="tot"><span class="n">'+L.total+'</span><span class="p"></span><span class="w">'+fmt(r.total)+' g</span></li>';
     $("note").textContent=L.note;
-    // diagram: outer ring = 45 cm
-    var rad=68*S.d/45; $("pz").setAttribute("r",rad.toFixed(1));
-    var h=r.p.h; $("sec").setAttribute("height",h); $("sec").setAttribute("y",158-h);
+    $("barBig").textContent=S.n+" × "+r.ball+" g";
+    $("barSub").textContent=L.flour+" "+fmt(r.flour)+" g · "+L.water+" "+fmt(r.water)+" g";
+    $("pz").setAttribute("r",(50*S.d/45).toFixed(1));
+    $("sec").setAttribute("height",r.p.h); $("sec").setAttribute("y",156-r.p.h);
     $("dia").setAttribute("aria-label",L.diaLabel(S.d));
+    if(lastLang!==S.lang){lastLang=S.lang; setWave(L.wave);}
     var yeastTxt=fmt(r.yeast)+" g "+(S.y==="fresh"?L.fresh:L.dry).toLowerCase();
-    var st=L.steps({water:fmt(r.water),flour:fmt(r.flour),salt:fmt(r.salt),oil:r.oil?fmt(r.oil):0,yeastTxt:yeastTxt,n:S.n,ball:r.ball,d:S.d});
-    $("steps").innerHTML=st.map(function(s){return '<li><div><b>'+s[0]+'</b><span>'+s[1]+'</span></div></li>'}).join("");
+    $("steps").innerHTML=L.steps({water:fmt(r.water),flour:fmt(r.flour),salt:fmt(r.salt),oil:r.oil?fmt(r.oil):0,yeastTxt:yeastTxt,n:S.n,ball:r.ball,d:S.d})
+      .map(function(s){return '<li><div><b>'+s[0]+'</b><span>'+s[1]+'</span></div></li>'}).join("");
     save();
   }
+
+  // Curved marquee: phrase repeated along a long wave, scrolled by exactly one phrase length so the loop is seamless
+  var tp=$("wvt"), period=600, off=0;
+  function setWave(phrase){
+    tp.textContent=phrase;
+    try{period=tp.getComputedTextLength()||600}catch(e){}
+    tp.textContent=new Array(9).join(phrase);
+  }
+  var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function startWave(){ if(reduce) { tp.setAttribute("startOffset",1800); return; }
+    (function tick(){off=(off+0.5)%period; tp.setAttribute("startOffset",(1800-period-off).toFixed(1)); requestAnimationFrame(tick)})(); }
 
   function setN(v){v=parseInt(v,10); if(isNaN(v)) return; S.n=Math.max(1,Math.min(40,v)); render();}
   $("minus").onclick=function(){setN(S.n-1)}; $("plus").onclick=function(){setN(S.n+1)};
   $("n").addEventListener("change",function(e){setN(e.target.value)});
+  $("n").addEventListener("focus",function(e){e.target.select()});
   $("d").addEventListener("input",function(e){S.d=+e.target.value; render();});
-  $("chips").addEventListener("click",function(e){var b=e.target.closest("[data-s]"); if(b){S.d=+b.dataset.s; render();}});
-  $("seg").addEventListener("click",function(e){var b=e.target.closest("[data-k]"); if(b){S.t=b.dataset.k; render(); $("seg").querySelector('[data-k="'+S.t+'"]').focus();}});
-  $("yseg").addEventListener("click",function(e){var b=e.target.closest("[data-k]"); if(b){S.y=b.dataset.k; render(); $("yseg").querySelector('[data-k="'+S.y+'"]').focus();}});
+  function pick(id,key){$(id).addEventListener("click",function(e){var b=e.target.closest("[data-k],[data-s]"); if(!b) return; if(key==="d") S.d=+b.dataset.s; else S[key]=b.dataset.k; render(); var sel=$(id).querySelector('[aria-pressed="true"]'); if(sel) sel.focus({preventScroll:true});});}
+  pick("chips","d"); pick("seg","t"); pick("yseg","y");
   document.querySelectorAll("[data-lang]").forEach(function(b){b.onclick=function(){S.lang=b.dataset.lang; render();}});
 
   $("copy").onclick=function(){
-    var L=T[S.lang], r=calc();
-    var txt=[S.n+" × "+S.d+" cm — "+L.th[S.t][0]+" ("+S.n+" × "+r.ball+" g)",
-      L.flour+": "+fmt(r.flour)+" g", L.water+": "+fmt(r.water)+" g", L.salt+": "+fmt(r.salt)+" g",
-      (S.y==="fresh"?L.fresh:L.dry)+": "+fmt(r.yeast)+" g"].concat(r.oil?[L.oil+": "+fmt(r.oil)+" g"]:[]).join("\n");
-    var t=$("toast");
+    var L=T[S.lang], r=calc(), t=$("toast");
+    var txt=[S.n+" × "+S.d+" cm, "+L.th[S.t][0]+" ("+S.n+" × "+r.ball+" g)",L.flour+": "+fmt(r.flour)+" g",L.water+": "+fmt(r.water)+" g",L.salt+": "+fmt(r.salt)+" g",(S.y==="fresh"?L.fresh:L.dry)+": "+fmt(r.yeast)+" g"].concat(r.oil?[L.oil+": "+fmt(r.oil)+" g"]:[]).join("\n");
     function fail(){t.textContent=L.copyFail; var sel=window.getSelection(),rg=document.createRange(); rg.selectNodeContents($("rows")); sel.removeAllRanges(); sel.addRange(rg);}
     try{navigator.clipboard.writeText(txt).then(function(){t.textContent=L.copied; setTimeout(function(){t.textContent=""},2400)},fail);}catch(e){fail()}
   };
 
-  // PWA: install prompt + service worker (only where supported)
+  // Mobile summary bar: hidden while the results band or the footer is on screen
+  try{ var vis={}; var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.id||"f"]=e.isIntersecting}); $("bar").classList.toggle("off",!!(vis.dosi||vis.f))},{threshold:.1});
+    io.observe($("dosi")); io.observe(document.querySelector("footer")); }catch(e){}
+
+  // PWA
   var deferred;
   window.addEventListener("beforeinstallprompt",function(e){e.preventDefault(); deferred=e; $("install").hidden=false;});
-  $("install").onclick=function(){ if(deferred){deferred.prompt(); deferred=null; $("install").hidden=true;} };
+  $("install").onclick=function(){if(deferred){deferred.prompt(); deferred=null; $("install").hidden=true;}};
   try{ if("serviceWorker" in navigator && document.querySelector('link[rel="manifest"]')) navigator.serviceWorker.register("sw.js").catch(function(){}); }catch(e){}
 
   render();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){lastLang=null; render(); startWave();}); else startWave();
 })();
 </script>
 </body>
