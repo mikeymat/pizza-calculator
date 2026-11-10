@@ -66,6 +66,7 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 
 /* Work area */
 .work{display:grid;grid-template-columns:minmax(0,1fr);align-items:start}
+.row2{display:grid;gap:30px}
 .controls{display:grid;gap:30px;padding-block:20px 44px;margin:0}
 .ctl{display:grid;gap:12px;min-width:0;border:0;margin:0;padding:0}
 .ctl legend{padding:0;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;width:100%;gap:12px}
@@ -200,43 +201,50 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
   .method{grid-template-columns:minmax(0,1fr) minmax(0,2fr);column-gap:56px;align-items:start}
   .method h2{grid-row:span 2}
 }
-/* Phones in landscape: controls and results side by side, compact chrome, display type sized by height */
+/* Phones in landscape: a kitchen station. No hero; compact controls on the left, the whole recipe on the right. */
 @media (orientation:landscape) and (max-height:540px) and (min-width:560px){
-  :root{--hh:56px}
+  :root{--hh:52px}
   .top{padding-block:6px}
-  .lang button{height:36px}
-  h1{font-size:min(18.5vw,24vh)}
-  .lede{margin-top:10px;gap:6px}
-  .lede p{display:none}
-  .lede h2{font-size:22px}
-  .lede h2 small{display:none}
-  .wave{height:44px;margin-top:14px}
-  .work{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:4px 32px}
-  .controls.g{padding:8px 0 0}
-  .controls{gap:20px}
-  .lbl{font-size:20px}
-  .ctl legend{margin-bottom:8px}
-  .stepper{height:52px;grid-template-columns:52px minmax(0,1fr) 52px}
-  .stepper button{height:48px}
-  .stepper input{font-size:24px}
+  .mark{font-size:19px}.mark svg{width:30px;height:30px}
+  .lang button{height:36px;min-width:46px}
+  .hero,.wave{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .work{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 28px}
+  .controls.g{padding:0}
+  .controls{gap:10px}
+  .ctl legend{margin-bottom:4px}
+  .ctl{gap:4px}
+  .lbl{font-size:16px;line-height:22px}
+  .val{font-size:14px}
+  .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  .stepper{height:46px;max-width:none;grid-template-columns:46px minmax(0,1fr) 46px}
+  .stepper button{height:42px}
+  .stepper input{font-size:22px}
   .pills{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-  .pill{padding:0 4px;height:44px;font-size:15px}
-  .opt{min-height:56px;padding:8px 14px 8px 12px;border-radius:24px}
-  .opt small{display:none}
-  .yeast .pill{height:46px}
-  .results.g{position:sticky;top:calc(var(--hh) + 8px);max-height:calc(100dvh - var(--hh) - 16px);overflow:auto;border-radius:22px;padding:14px 18px 16px;gap:10px;align-self:start;overscroll-behavior:contain}
-  .res-head{gap:10px}
-  .res-head .k{font-size:15px}
-  .big{font-size:48px;margin-top:2px}
-  .meta{font-size:14px;margin-top:4px}
-  .arch{width:70px}
-  .list li{padding-block:6px;gap:10px}
-  .list .n{font-size:16px}
-  .list .w{font-size:19px;min-width:70px}
-  .btn{height:44px}
-  .note{display:none}
+  .pill{padding:0 2px;height:44px;font-size:14.5px}
+  .range{height:26px;margin:0}
+  .opts{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .opt{grid-template-columns:1fr;justify-items:center;text-align:center;gap:2px;min-height:52px;padding:4px;border-radius:20px}
+  .opt svg{width:30px;height:14px}
+  .opt>span:nth-of-type(1) small{display:none}
+  .opt b{font-size:15px}
+  .opt .gw{font-size:13px}
+  .yeast{gap:6px}
+  .yeast .pill{height:46px;font-size:15px}
+  .results.g{position:sticky;top:calc(var(--hh) + env(safe-area-inset-top,0px) + 8px);max-height:calc(100dvh - var(--hh) - 18px);overflow:auto;border-radius:22px;padding:12px 16px 12px;gap:8px;align-self:start;overscroll-behavior:contain}
+  .res-head{gap:10px;align-items:center}
+  .res-head .k{font-size:14px}
+  .big{font-size:42px;margin-top:0}
+  .meta{font-size:13px;margin-top:2px}
+  .arch{width:58px}
+  .list{border-top-width:1.5px}
+  .list li{padding-block:4px;gap:8px}
+  .list .n{font-size:15px}
+  .list .p{font-size:13px}
+  .list .w{font-size:17px;min-width:64px}
+  .list li.tot{padding-top:6px}
+  .res-actions,.note{display:none}
   .bar{display:none}
-  .method{padding-block:40px 48px}
+  .method{padding-block:36px 44px}
   .method h2{font-size:min(11vw,18vh)}
   .sign{font-size:min(13.6vw,30vh)}
 }
@@ -272,6 +280,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
 
   <div class="work" id="calc">
     <form class="controls g" id="f" onsubmit="return false">
+      <div class="row2">
       <fieldset class="ctl">
         <legend><span class="lbl" data-t="qty">Quante pizze?</span></legend>
         <div class="stepper">
@@ -280,6 +289,11 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
           <button type="button" id="plus" aria-label="+1"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 11h14M11 4v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         </div>
       </fieldset>
+      <fieldset class="ctl">
+        <legend><span class="lbl" data-t="yeast">Lievito</span></legend>
+        <div class="yeast" id="yseg"></div>
+      </fieldset>
+      </div>
 
       <fieldset class="ctl">
         <legend><span class="lbl" data-t="size">Diametro</span><span class="val num" id="dval">30 cm</span></legend>
@@ -292,10 +306,6 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
         <div class="opts" id="seg"></div>
       </fieldset>
 
-      <fieldset class="ctl">
-        <legend><span class="lbl" data-t="yeast">Lievito</span></legend>
-        <div class="yeast" id="yseg"></div>
-      </fieldset>
     </form>
 
     <section class="results g" id="dosi" aria-live="polite">
@@ -503,6 +513,17 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
     try{navigator.clipboard.writeText(txt).then(function(){t.textContent=L.copied; setTimeout(function(){t.textContent=""},2400)},fail);}catch(e){fail()}
   };
 
+  // In-page links: land the target just below the sticky header, whatever its real height
+  document.addEventListener("click",function(e){
+    var a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a) return;
+    var id=a.getAttribute("href").slice(1), t=document.getElementById(id); if(!t) return;
+    e.preventDefault();
+    if(id==="dosi"&&getComputedStyle(t).position==="sticky") t=document.getElementById("calc");
+    var el=id==="dosi"?t.querySelector(".res-head")||t:t;
+    var hb=document.querySelector(".top").getBoundingClientRect().bottom;
+    var y=el.getBoundingClientRect().top+window.scrollY-hb-(id==="dosi"?14:6);
+    window.scrollTo({top:Math.max(0,y),behavior:reduce?"auto":"smooth"});
+  });
   // Mobile summary bar: hidden while the results band or the footer is on screen
   try{ var vis={}; function upd(es){es.forEach(function(e){vis[e.target.className||e.target.tagName]=e.isIntersecting}); $("bar").classList.toggle("off",!!(vis["res-head"]||vis["list num"]||vis.FOOTER));}
     var io1=new IntersectionObserver(upd,{threshold:.6}); io1.observe(document.querySelector(".res-head"));
