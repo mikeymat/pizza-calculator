@@ -48,7 +48,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .toplinks a{color:var(--butter);text-decoration:none;display:none}
 .toplinks a:hover{text-decoration:underline;text-underline-offset:4px}
 .lang{display:inline-flex;border:1.5px solid var(--butter);border-radius:999px;padding:3px}
-.lang button{background:none;border:0;border-radius:999px;min-width:44px;height:36px;font-weight:600;font-size:14px;color:var(--butter)}
+.lang button{background:none;border:0;border-radius:999px;min-width:48px;height:40px;font-weight:600;font-size:15px;color:var(--butter)}
 .lang button[aria-pressed="true"]{background:var(--butter);color:var(--tomato-deep)}
 
 /* Hero */
@@ -83,7 +83,7 @@ h1{margin:0;color:var(--butter);font-weight:700;font-size:clamp(60px,18.5vw,232p
 .pill{border:1.5px solid var(--butter);background:none;color:var(--butter);border-radius:999px;height:48px;padding:0 8px;font-weight:600;font-size:16px;white-space:nowrap;transition:background .25s var(--ease),color .25s var(--ease)}
 .pill:hover{background:color-mix(in srgb,var(--butter) 18%,transparent)}
 .pill[aria-pressed="true"]{background:var(--butter);color:var(--tomato-deep)}
-.range{-webkit-appearance:none;appearance:none;width:100%;margin:8px 0 0;height:36px;background:none;cursor:pointer}
+.range{-webkit-appearance:none;appearance:none;width:100%;margin:6px 0 0;height:44px;background:none;cursor:pointer;touch-action:pan-y}
 .range::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(var(--butter),var(--butter)) 0/var(--fill,40%) 100% no-repeat,color-mix(in srgb,var(--butter) 30%,transparent)}
 .range::-moz-range-track{height:4px;border-radius:4px;background:color-mix(in srgb,var(--butter) 30%,transparent)}
 .range::-moz-range-progress{height:4px;border-radius:4px;background:var(--butter)}
@@ -453,8 +453,8 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
   };
 
   // Mobile summary bar: hidden while the results band or the footer is on screen
-  try{ var vis={}; var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.id||"f"]=e.isIntersecting}); $("bar").classList.toggle("off",!!(vis.dosi||vis.f))},{threshold:.1});
-    io.observe($("dosi")); io.observe(document.querySelector("footer")); }catch(e){}
+  try{ var vis={}; var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.tagName]=e.isIntersecting}); $("bar").classList.toggle("off",!!(vis.DIV||vis.FOOTER))},{threshold:.6});
+    io.observe(document.querySelector(".res-head")); io.observe(document.querySelector("footer")); }catch(e){}
 
   // PWA
   try{ if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone){ $("how").hidden=true; $("installed").hidden=false; } }catch(e){}
