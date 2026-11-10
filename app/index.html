@@ -467,8 +467,9 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
     $("ball").innerHTML=r.ball+"<small>g</small>";
     $("ballk").textContent=L.ballsOf(S.n);
     $("ballsub").textContent=S.d+" cm · "+L.th[S.t][0]+" · "+Math.round(r.p.hyd*100)+"% "+L.hyd;
-    var rows=[[L.flour,r.flour,"100%"],[L.water,r.water,pct(r.p.hyd)],[L.salt,r.salt,pct(SALT)],[S.y==="fresh"?L.fresh:L.dry,r.yeast,pct(YEAST[S.y])]];
+    var rows=[[L.flour,r.flour,"100%"],[L.water,r.water,pct(r.p.hyd)],[L.salt,r.salt,pct(SALT)]];
     if(r.oil) rows.push([L.oil,r.oil,pct(r.p.oil)]);
+    rows.push([S.y==="fresh"?L.fresh:L.dry,r.yeast,pct(YEAST[S.y])]);
     $("rows").innerHTML=rows.map(function(x){return '<li><span class="n">'+x[0]+'</span><span class="p">'+x[2]+'</span><span class="w">'+fmt(x[1])+' g</span></li>'}).join("")+
       '<li class="tot"><span class="n">'+L.total+'</span><span class="p"></span><span class="w">'+fmt(r.total)+' g</span></li>';
     $("note").textContent=L.note;
@@ -508,7 +509,7 @@ footer{background:var(--ink);color:var(--cream);padding-block:56px 0;overflow:hi
 
   $("copy").onclick=function(){
     var L=T[S.lang], r=calc(), t=$("toast");
-    var txt=[S.n+" × "+S.d+" cm, "+L.th[S.t][0]+" ("+S.n+" × "+r.ball+" g)",L.flour+": "+fmt(r.flour)+" g",L.water+": "+fmt(r.water)+" g",L.salt+": "+fmt(r.salt)+" g",(S.y==="fresh"?L.fresh:L.dry)+": "+fmt(r.yeast)+" g"].concat(r.oil?[L.oil+": "+fmt(r.oil)+" g"]:[]).join("\n");
+    var txt=[S.n+" × "+S.d+" cm, "+L.th[S.t][0]+" ("+S.n+" × "+r.ball+" g)",L.flour+": "+fmt(r.flour)+" g",L.water+": "+fmt(r.water)+" g",L.salt+": "+fmt(r.salt)+" g"].concat(r.oil?[L.oil+": "+fmt(r.oil)+" g"]:[]).concat([(S.y==="fresh"?L.fresh:L.dry)+": "+fmt(r.yeast)+" g"]).join("\n");
     function fail(){t.textContent=L.copyFail; var sel=window.getSelection(),rg=document.createRange(); rg.selectNodeContents($("rows")); sel.removeAllRanges(); sel.addRange(rg);}
     try{navigator.clipboard.writeText(txt).then(function(){t.textContent=L.copied; setTimeout(function(){t.textContent=""},2400)},fail);}catch(e){fail()}
   };
